@@ -22,15 +22,24 @@ wos <- convert2df(file = "./data/wos.txt", dbsource = 'wos',
 # 170 from WoS
 
 coreDSEworks <- mergeDbSources(scopus, wos)
+rm(scopus, wos)
 # cleaning and merging yields 293 records
 
-# rm-list.txt identifies: records that are so incomplete that the text cannot
-# be found; records that are duplicated; and records the represent full
-# proceedings documents for conferences that were not primarily focused on
-# data science education. I identified these manually.
-stoplist <- scan("rm-list.txt", what="", sep="\n")
-coreDSEworks <- coreDSEworks[ ! coreDSEworks$UT %in% stoplist, ]
-# 8 records removed; yields 285 records
+# rm-list.txt identifies:
+# records that are so incomplete that the text cannot be found;
+# records that are duplicated (which breaks referenceMatrix construction); and
+# records the represent full proceedings for conferences that were not
+# primarily focused on data science education.
+rmlist <- scan("rm-list.txt", what="", sep="\n")
+
+# I identified rm-list members manually; if you want to check my work uncomment
+# what's below and review the two CSV outputs. I could automate some of this
+# with doi match but it's not reliable. Maybe build in as a step.
+# write.csv(coreDSEworks[ coreDSEworks$UT %in% rmlist, ], "removedRefWorks.csv")
+# write.csv(mergeDbSources(scopus, wos), "inspectWorks.csv")
+
+coreDSEworks <- coreDSEworks[ ! coreDSEworks$UT %in% rmlist, ]
+# 12 records removed; yields 281 records
 
 # Some records (e.g. websites, reference works) do not have TI populated
 # This duplicates the SO col to TI to make the record user-friendly
@@ -38,30 +47,75 @@ titlelist <- scan("title-list.txt", what="", sep="\n")
 for(ut in titlelist) { coreDSEworks["TI"][coreDSEworks["UT"]==ut] <-
   coreDSEworks["SO"][coreDSEworks["UT"]==ut] }
 
+rm(rmlist,titlelist,ut)
+
 # summary results of core DSE works
 coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
 summary(coreBibAnalysis, max=10)
 
 # get a data frame of the references.
-referenceWorks <- as.data.frame(citations(coreDSEworks, field = "article", sep = ";")$Cited)
+refWorks <- as.data.frame(
+  citations(coreDSEworks, field = "article", sep = ";")$Cited)
+
+# whoa nelly, the reference list has some disaster duplicates.
+# we'll clear them out using bibliometix::duplicatedMatching.
+# but to do that, we need a character vector. Let's keep both
+# cols so we can check our work.
+refWorks$charCR <- as.character(refWorks$CR)
+# get the rows and columns of items that closely but not exactly match
+matches <- as.data.frame(which(stringdist::stringdistmatrix(
+  smallerTest[["CR"]], smallerTest[["CR"]]) < 5, arr.ind=TRUE)) %>%
+  filter(row<col)
+
+# the earlier the row, the more popular that version of the ref so let's call
+# that main and all other versions dup
+colnames(matches) <- c("main","dup")
+
+# consolidate cites to the first instance and remove the later instance.
+# maybe change names from row/col to main and dup?
+for( item in 1:nrow(matches) ) {
+  smallerTest$Freq[matches$main[item]] <-
+    smallerTest$Freq[matches$main[item]] +
+    smallerTest$Freq[matches$dup[item]]
+}
+
+# after the new frequency is calculated, you can get rid of the dup items
+
+smallerTest$Freq[matches$main[item]]???
+
+
+# make a matrix where nonzero values are very-near-matches
+matches <- stringdist::stringdistmatrix(
+  smallerTest[["CR"]],
+  smallerTest[["CR"]])[stringdist::stringdistmatrix(
+    smallerTest[["CR"]],
+    smallerTest[["CR"]])<5]
 
 # build co-citation network of DSE cited works
-referenceMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
+refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
                            network = "references", sep = ";")
 
-# set a cut off of number of cites for a paper to qualify as refNet member
-cutoff = as.integer(count(referenceWorks %>% filter(Freq>3)))
-refNet=networkPlot(referenceMatrix, n = 71,
+# Setting a cutoff to include only papers referenced 4 or more times in the
+# network. The clusters hold steady with cutoffs down 2 or more times
+cutoff = as.integer(count(refWorks %>% filter(Freq>3)))
+refNet=networkPlot(refMatrix, n = cutoff,
                    Title = "Co-Citation Network of Top 100 Cited Papers",
                    size.cex=TRUE, size=15, remove.multiple=FALSE,
                    remove.isolates = TRUE, labelsize=.7, edgesize = 5,
-                   edges.min=0, type = "fruchterman", cluster = "louvain")
+                   edges.min=0, type = "fruchterman", cluster="louvain")
 net2VOSviewer(refNet,".")
 
-# NOTE: Broker papers get clustered differently depending on the algorithm. This
-# makes sense. Any paper that is clustered differently across networkPlot
-# and net2VOSviewer will not be considered an "identifying paper" for
-# its corresponding foundational collection.
+# Let's check out the "brokers" in our reference network - that is, the papers
+# that have been cited alongside works from otherwise distinct clusters.
+brokers <- refNet[["cluster_res"]] %>% filter( btw_centrality >= 100 )
+
+# Let's sort them by popularity
+refWorks %>% filter(brokers %in% refWorks$CR)
+
+# Now, look for "core" cluster membership of the referenced papers. These are
+# papers that have low betweenness centrality. Examining only these papers that
+# are cited only with others in their community, but not more broadly, can
+# help us identify what are thematic distinctions between clusters.
 
 # Find the records with the most name matches in the ref list.
 # This is incomplete; ideally I'd use labelShort() and removeDuplicatedlabels()
@@ -69,7 +123,7 @@ net2VOSviewer(refNet,".")
 # papers to pull and examine further but does not ensure exact ref matches.
 
 # get first author names of member authors for each cluster
-referenceClusterAuthors <- net100[["cluster_res"]] %>%
+referenceClusterAuthors <- refNet[["cluster_res"]] %>%
   # restrict this to only authors of papers that are not very connected
   # outside of their specific cluster
   filter( btw_centrality < 100 ) %>%
