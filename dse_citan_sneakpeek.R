@@ -46,7 +46,7 @@ coreDSEworks <- coreDSEworks[ ! coreDSEworks$UT %in% rmlist, ]
 # This duplicates the SO col to TI to make the record user-friendly
 titlelist <- scan("title-list.txt", what="", sep="\n")
 for(ut in titlelist) { coreDSEworks["TI"][coreDSEworks["UT"]==ut] <-
-  coreDSEworks["SO"][coreDSEworks["UT"]==ut] }
+coreDSEworks["SO"][coreDSEworks["UT"]==ut] }
 
 rm(rmlist,titlelist,ut)
 
@@ -70,18 +70,41 @@ refWorks <- as.data.frame(
 matches <- as.data.frame(which(stringdist::stringdistmatrix(
   refWorks[["CR"]], refWorks[["CR"]]) < 5, arr.ind=TRUE)) %>%
   filter(row<col)
-colnames(matches) <- c("main","dup")
+colnames(matches) <- c("main","dupe")
+matches <- matches %>% arrange(matches,main)
 
 # Let's add a column to our refWorks of cleaned refs.
 refWorks$cleanCR <- refWorks$CR
-refWorks[c(matches$dup),]$cleanCR <- refWorks[c(matches$main),]$CR
+# put the main (more freq then alpha) ref into all the dupes
+#refWorks[c(matches$dupe),]$cleanCR <- refWorks[c(matches$main),]$CR
+
+# matches reveals 440 refs with near typos
+# some have multiple near typos, or recursively close typo children
+# we'll do what we can... it's a forest of typos
+df <- data.frame(main=0, dupe=distinct(matches,main))
+colnames(df) <- c("main","dupe")
+typoRecord <- bind_rows(matches,df)
+typoRecord$Freq <- refWorks$Freq[typoRecord$dupe]
+typoForest <- FromDataFrameNetwork(bind_rows(matches,df))
+# aggregate the cited counts and
+
+
 
 # And let's consolidate citations from dups to the main
-for( item in 1:nrow(matches) ) {
-  refWorks$Freq[matches$main[item]] <-
-    refWorks$Freq[matches$main[item]] +
-    refWorks$Freq[matches$dup[item]]
-  print(paste("Adding",refWorks$Freq[matches$dup[item]],"to",refWorks$CR[matches$main[item]]))
+for( i in 1:nrow(matches) ) {
+  # for each row of matches
+  # while the dupe index is a main somewhere
+  j <- i
+  while(matches$dupe[j] %in% matches$main) {
+    #get the dupe indices of this main
+    j <- matches$main[j]
+  }
+  refWorks$Freq[matches$main[i]] <-
+    refWorks$Freq[matches$main[i]] +
+    refWorks$Freq[matches$dupe[i]]
+  refWorks$Freq[matches$dupe[i]] <- 0
+  refWorks$cleanCR[matches$dupe[i]] <- refWorks$CR[matches$main[i]]
+  print(paste("Adding",refWorks$Freq[matches$dupe[i]],"to",refWorks$CR[matches$main[i]]))
 }
 
 # report how many dups and how many actual refs
