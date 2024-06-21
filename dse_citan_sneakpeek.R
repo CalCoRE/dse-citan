@@ -6,6 +6,7 @@
 library(agop)
 library(bibliometrix)
 library(dplyr)
+library(stringdist) # for reference cleanup
 library(stringr)
 library(textTools)
 
@@ -57,39 +58,55 @@ summary(coreBibAnalysis, max=10)
 refWorks <- as.data.frame(
   citations(coreDSEworks, field = "article", sep = ";")$Cited)
 
-# whoa nelly, the reference list has some disaster duplicates.
-# we'll clear them out using bibliometix::duplicatedMatching.
-# but to do that, we need a character vector. Let's keep both
-# cols so we can check our work.
-refWorks$charCR <- as.character(refWorks$CR)
-# get the rows and columns of items that closely but not exactly match
-matches <- as.data.frame(which(stringdist::stringdistmatrix(
-  smallerTest[["CR"]], smallerTest[["CR"]]) < 5, arr.ind=TRUE)) %>%
-  filter(row<col)
+# The reference list has some disasterous near-duplicates with typos.
+# Let's clear them out using bibliometix::duplicatedMatching
+# and build a lookup table to replace them in coreDSEworks and anywhere
+# else we might need them.
 
-# the earlier the row, the more popular that version of the ref so let's call
-# that main and all other versions dup
+# first, get the rows and columns of items that closely but not exactly match
+# be patient, this is a monster. Full refs list of 8592
+# yields 595 dupe matches. Mains are lower indices = more frequently ref'd
+# TODO: change to tolerance
+matches <- as.data.frame(which(stringdist::stringdistmatrix(
+  refWorks[["CR"]], refWorks[["CR"]]) < 5, arr.ind=TRUE)) %>%
+  filter(row<col)
 colnames(matches) <- c("main","dup")
 
-# consolidate cites to the first instance and remove the later instance.
-# maybe change names from row/col to main and dup?
+# Let's add a column to our refWorks of cleaned refs.
+refWorks$cleanCR <- refWorks$CR
+refWorks[c(matches$dup),]$cleanCR <- refWorks[c(matches$main),]$CR
+
+# And let's consolidate citations from dups to the main
 for( item in 1:nrow(matches) ) {
-  smallerTest$Freq[matches$main[item]] <-
-    smallerTest$Freq[matches$main[item]] +
-    smallerTest$Freq[matches$dup[item]]
+  refWorks$Freq[matches$main[item]] <-
+    refWorks$Freq[matches$main[item]] +
+    refWorks$Freq[matches$dup[item]]
+  print(paste("Adding",refWorks$Freq[matches$dup[item]],"to",refWorks$CR[matches$main[item]]))
 }
 
-# after the new frequency is calculated, you can get rid of the dup items
+# report how many dups and how many actual refs
+paste( "I found", count(matches),
+       "dupes which leaves", count(refWorks) - count(matches),
+       "real refs" )
 
-smallerTest$Freq[matches$main[item]]???
+# and re-index the refWorks dataframe using the fixed reference counts
+refWorks <- refWorks %>% arrange(desc(Freq))
 
+# for the remainder of this first sketch, I'm just going to look at refs
+# that have been cited 4 or more times.
+topRefWorks <- refWorks %>% filter(Freq > 3)
 
-# make a matrix where nonzero values are very-near-matches
-matches <- stringdist::stringdistmatrix(
-  smallerTest[["CR"]],
-  smallerTest[["CR"]])[stringdist::stringdistmatrix(
-    smallerTest[["CR"]],
-    smallerTest[["CR"]])<5]
+#make a df from the refs
+# NOTE currentRefsList is the thing I'd construct in the loop
+currentRefsList <- as.data.frame(str_split(coreDSEworks$CR[2],";"))
+colnames(currentRefsList) <- c("ref")
+currentRefsList$ref <- refWorks$cleanCR %>% filter(currentRefsList$ref)
+
+# WEIRD - this does not match dupes. check it out tomorrow.
+lookupBadRefs <- refWorks %>% filter(CR != cleanCR)
+
+# put it back together
+cat(as.character(testResult),sep="; ")
 
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
