@@ -10,102 +10,51 @@ library(stringdist) # for reference cleanup
 library(stringr)
 library(textTools)
 
+source("dse_citan.R")
+
 # Records last updated 6/14/24.
 # Query inputted to Scopus and WoS were "data science education" in the
-#   title, abstract, or keywords of a record.
+# title, abstract, or keywords of a record.
 # Removed corrections, retractions, notes. Kept early access records.
 
-scopus <- convert2df(file = "./data/scopus.csv", dbsource = 'scopus',
-                     format = "csv")
-# 276 from Scopus
-wos <- convert2df(file = "./data/wos.txt", dbsource = 'wos',
-                  format = "plaintext")
-# 170 from WoS
-
-coreDSEworks <- mergeDbSources(scopus, wos)
-rm(scopus, wos)
-# cleaning and merging yields 293 records
-
-# rm-list.txt identifies:
-# records that are so incomplete that the text cannot be found;
-# records that are duplicated (which breaks referenceMatrix construction); and
-# records the represent full proceedings for conferences that were not
-# primarily focused on data science education.
-rmlist <- scan("rm-list.txt", what="", sep="\n")
-
-# I identified rm-list members manually; if you want to check my work uncomment
-# what's below and review the two CSV outputs. I could automate some of this
-# with doi match but it's not reliable. Maybe build in as a step.
-# write.csv(coreDSEworks[ coreDSEworks$UT %in% rmlist, ], "removedRefWorks.csv")
-# write.csv(mergeDbSources(scopus, wos), "inspectWorks.csv")
-
-coreDSEworks <- coreDSEworks[ ! coreDSEworks$UT %in% rmlist, ]
-# 12 records removed; yields 281 records
-
-# Some records (e.g. websites, reference works) do not have TI populated
-# This duplicates the SO col to TI to make the record user-friendly
-titlelist <- scan("title-list.txt", what="", sep="\n")
-for(ut in titlelist) { coreDSEworks["TI"][coreDSEworks["UT"]==ut] <-
-coreDSEworks["SO"][coreDSEworks["UT"]==ut] }
-
-rm(rmlist,titlelist,ut)
-
-# summary results of core DSE works
-coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
-summary(coreBibAnalysis, max=10)
+coreDSEworks <- getCoreDSEWorks()
 
 # get a data frame of the references.
 refWorks <- as.data.frame(
   citations(coreDSEworks, field = "article", sep = ";")$Cited)
 
-# The reference list has some disasterous near-duplicates with typos.
-# Let's clear them out using bibliometix::duplicatedMatching
-# and build a lookup table to replace them in coreDSEworks and anywhere
-# else we might need them.
+# The reference list has some disasterous typos that cause several citations
+# to be missed or mis-mapped by bibliometrix. I cleared them out using
+# stringdist to build a lookup table of typos back to the most frequently
+# cited version of each reference. Computing the pairwise string distances
+# of an 8.5K matrix of refs takes hours on a typical computer, so here I'm
+# using a saved csv.
 
-# first, get the rows and columns of items that closely but not exactly match
-# be patient, this is a monster. Full refs list of 8592
-# yields 595 dupe matches. Mains are lower indices = more frequently ref'd
-# TODO: change to tolerance
-matches <- as.data.frame(which(stringdist::stringdistmatrix(
-  refWorks[["CR"]], refWorks[["CR"]]) < 5, arr.ind=TRUE)) %>%
-  filter(row<col)
-colnames(matches) <- c("main","dupe")
-matches <- matches %>% arrange(matches,main)
+matches <- read.csv("matches5.csv")
 
-# Let's add a column to our refWorks of cleaned refs.
-refWorks$cleanCR <- refWorks$CR
-# put the main (more freq then alpha) ref into all the dupes
-#refWorks[c(matches$dupe),]$cleanCR <- refWorks[c(matches$main),]$CR
+# Uncomment the lines below to recalculate the matrix (for example, if you
+# have updated your coreDSEworks).
 
-# matches reveals 440 refs with near typos
-# some have multiple near typos, or recursively close typo children
-# we'll do what we can... it's a forest of typos
-df <- data.frame(main=0, dupe=distinct(matches,main))
-colnames(df) <- c("main","dupe")
-typoRecord <- bind_rows(matches,df)
-typoRecord$Freq <- refWorks$Freq[typoRecord$dupe]
-typoForest <- FromDataFrameNetwork(bind_rows(matches,df))
-# aggregate the cited counts and
+# matches <- as.data.frame(which(stringdist::stringdistmatrix(
+#   refWorks[["CR"]], refWorks[["CR"]]) < 5, arr.ind=TRUE)) %>%
+#   filter(row<col)
+# colnames(matches) <- c("main","dupe")
 
+cleanRefsLookup <- data.frame()
 
-
-# And let's consolidate citations from dups to the main
+# Consolidate citations from dups to the main - get it done way
 for( i in 1:nrow(matches) ) {
-  # for each row of matches
-  # while the dupe index is a main somewhere
-  j <- i
-  while(matches$dupe[j] %in% matches$main) {
-    #get the dupe indices of this main
-    j <- matches$main[j]
-  }
   refWorks$Freq[matches$main[i]] <-
     refWorks$Freq[matches$main[i]] +
     refWorks$Freq[matches$dupe[i]]
-  refWorks$Freq[matches$dupe[i]] <- 0
-  refWorks$cleanCR[matches$dupe[i]] <- refWorks$CR[matches$main[i]]
   print(paste("Adding",refWorks$Freq[matches$dupe[i]],"to",refWorks$CR[matches$main[i]]))
+  refWorks$Freq[matches$dupe[i]] <- 0
+  cleanRefsLookup <- rbind(cleanRefsLookup,
+                           data.frame(refWorks$CR[matches$main[i]],
+                                      refWorks$CR[matches$dupe[i]]))
 }
+
+colnames(cleanRefsLookup) <- c("main","dupe")
 
 # report how many dups and how many actual refs
 paste( "I found", count(matches),
@@ -115,21 +64,27 @@ paste( "I found", count(matches),
 # and re-index the refWorks dataframe using the fixed reference counts
 refWorks <- refWorks %>% arrange(desc(Freq))
 
-# for the remainder of this first sketch, I'm just going to look at refs
-# that have been cited 4 or more times.
-topRefWorks <- refWorks %>% filter(Freq > 3)
-
-#make a df from the refs
-# NOTE currentRefsList is the thing I'd construct in the loop
-currentRefsList <- as.data.frame(str_split(coreDSEworks$CR[2],";"))
-colnames(currentRefsList) <- c("ref")
-currentRefsList$ref <- refWorks$cleanCR %>% filter(currentRefsList$ref)
-
-# WEIRD - this does not match dupes. check it out tomorrow.
-lookupBadRefs <- refWorks %>% filter(CR != cleanCR)
-
-# put it back together
-cat(as.character(testResult),sep="; ")
+for( i in i:nrow(coreDSEworks) ) {
+  currentRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
+  colnames(currentRefsList) <- c("ref")
+  typoRefs <- match(currentRefsList$ref,cleanRefsLookup$dupe)
+  currentRefsList$ref[!is.na(typoRefs)] <-
+    cleanRefsLookup$main[na.omit(
+      match(currentRefsList$ref,cleanRefsLookup$dupe))]
+  coreDSEworks$CR[i] <- paste(currentRefsList$ref,collapse="; ")
+  print(paste(i,"Replaced"))
+}
+# #make a df from the refs
+# # NOTE currentRefsList is the thing I'd construct in the loop
+# currentRefsList <- as.data.frame(str_split(coreDSEworks$CR[2],"; "))
+# colnames(currentRefsList) <- c("ref")
+#
+# # replace dupes with mains
+# typoRefs <- match(currentRefsList$ref,cleanRefsLookup$dupe)
+# currentRefsList$ref[!is.na(typoRefs)] <- cleanRefsLookup$main[na.omit(match(currentRefsList$ref,cleanRefsLookup$dupe))]
+#
+# # put it back together
+# coreDSEworks$CR[2] <- paste(currentRefsList$ref,collapse="; ")
 
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
@@ -201,3 +156,8 @@ cleanRecords$CLSFARD<- str_count(cleanRecords$CR,
 cleanRecords$CLSBEIH<- str_count(cleanRecords$CR,
                                  regex('biehler',
                                        ignore_case = T))
+
+
+# summary results of core DSE works
+coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
+summary(coreBibAnalysis, max=10)
