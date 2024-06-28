@@ -1,7 +1,7 @@
-# Sneak peek code at a bibliometric analysis exploring the emergent literature
-# on data science education.
+# Bibliometric analysis exploring what papers that describe themselves as
+# "data science education" cite as references
 # Michelle Hoda Wilkerson
-# Jun 15, 2024
+# updated Jun 27, 2024
 
 library(agop)
 library(bibliometrix)
@@ -14,7 +14,7 @@ source("dse_citan.R")
 # Records last updated 6/14/24.
 # Query inputted to Scopus and WoS were "data science education" in the
 # title, abstract, or keywords of a record.
-# Removed corrections, retractions, notes. Kept early access records.
+# Remove corrections, retractions, notes. Keep early access records.
 
 coreDSEworks <- getCoreDSEWorks()
 
@@ -23,45 +23,40 @@ refWorks <- as.data.frame(
   citations(coreDSEworks, field = "article", sep = ";")$Cited)
 
 # The reference list has typos that cause several references
-# to be incorrectly counted and mapped.
-
-# Here I use stringdist to build a lookup table of near-dupes.
-# Computing the pairwise string distances
-# of an 8.5K matrix of refs takes hours on a typical computer, so here I'm
-# using a saved csv.
-
-#matches <- read.csv("matches5.csv")
-
-# NOTICE: Uncomment the lines below to reconstruct the matrix. It takes
-# hours to run on a standard laptop... don't forget to save your new matches!
-#matches <- as.data.frame(which(stringdist::stringdistmatrix(
-#  refWorks[["CR"]], refWorks[["CR"]]) < 5, arr.ind=TRUE)) %>%
-#  filter(row<col)
-
-#colnames(matches) <- c("main","dupe")
+# to be incorrectly counted and mapped. Below I'm making a lookup
+# table that maps all the less common (but matching) reference formats
+# back to whatever the most popular form of the reference is.
 
 cleanRefs <- as.data.frame(matrix(nrow=1,ncol=4))
 colnames(cleanRefs) <- c("Freq", "CR", "correctedFreq", "correctedCR")
 refWorks$counted <- FALSE
 
-#note I'm matching on the first 80% of the ref. if there are multiple versions
-# of something like a textbook, this aggregates them.
+# NOTE: If the loop below breaks, or if your cleanRefs looks wonky, there is
+# probably a new funky character somewhere you need to exclude using the
+# list below. Find the character by looking for cleanRefs records with
+# uncharacteristically high citation counts mapped to misidentified dupes.
+charExcludeList <- '[\\:\\(\\)+\\?\\|]'
+
+# I'm matching on the first 75% of the ref. if there are multiple versions
+# of something like a textbook, this would aggregate them. It looks at the
+# first part since the last part is most likely where reasonable differences
+# emerge - journal abbreviations, different levels of detail (doi,
+# conference dates, page numbers etc).
 for( i in 1:nrow(refWorks) ) {
 
-  # is there any meat to this entry
-  compareTo <- gsub('[\\:\\(\\)+\\?\\|]','',refWorks$CR[i])
+  # get a clean version of the reference text
+  compareTo <- gsub(charExcludeList,'',refWorks$CR[i])
 
-  if( str_length(compareTo) > 25) {
+  # if there is any meat to the entry
+  if( str_length(compareTo) > 40) {
 
     # get the group of like refs that haven't already been captured
     refGroup <- refWorks %>% filter(counted==FALSE) %>%
-      filter( gsub('[\\:\\(\\)+\\?\\|]','',CR) %like% substr(
+      filter( gsub(charExcludeList,'',CR) %like% substr(
         compareTo,0,str_length(compareTo)*.75) )
-    print(i)
 
-    # if this ref has any like entries let's consolidate them
+    # if we find this ref has any like entries, let's consolidate them
     if( nrow(refGroup) > 0 ) {
-      print(i)
       #make the most popular one parent
       refGroup$correctedCR <- refGroup$CR[1]
 
@@ -75,92 +70,57 @@ for( i in 1:nrow(refWorks) ) {
       #add the adjusted group entries to cleanRefs
       cleanRefs <- bind_rows(cleanRefs, refGroup)
     } else {
-      refWorks$counted[i] <- TRUE
+      refWorks$counted[i] <- TRUE #ignore in future groupings
     }
   } else {
-    refWorks$counted[i] <- TRUE
+    refWorks$counted[i] <- TRUE #ignore in future groupings
   }
 }
 
+# the moment of truth, whereby the less common forms of references in the
+# actual reference list of coreDSEworks references are replaced with the
+# most common form so citations are counted and networked properly.
+for( i in 1:nrow(coreDSEworks) ) {
+  thisRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
+  colnames(thisRefsList) <- c("ref")
 
+  thisRefsList[] <- cleanRefs$correctedCR[match(unlist(thisRefsList), cleanRefs$CR)]
 
-# matching faulty duplicates should be transitive, but is not yet:
-# The matches table may identify B as a dupe of A and C as a dept of B, without
-# a direct link between A and C. Below, I climb through parent/child pairs
-# as trees to generate a list of transitively matching duplicates.
-getDupes <- function(mainRefIndex,l=list()) {
-  if( any(matches %>% filter(main == mainRefIndex ) ) ) {
-    children <- (matches %>% filter(main == mainRefIndex))$dupe
-    l <- lapply(children, getDupes)
-  }
-  return( unname(append(unlist(l),mainRefIndex)))
+  #typoRefs <- match(thisRefsList$ref,cleanRefs$CR)
+  #thisRefsList$ref[!is.na(typoRefs)] <-
+  # cleanRefs$correctedCR[na.omit(
+  #   match(thisRefsList$ref,cleanRefs$CR))]
+  # if this
+
+  #thisRefsList$ref[thisRefsList$ref %in% cleanRefs$CR] <-
+
+  #cleanRefs$correctedCR[cleanRefs$CR %in% thisRefsList$ref]
+
+  #if( any(cleanRefs$CR==thisRefsList$ref) ) {
+  #  thisRefsList$ref <- cleanRefs[cleanRefs$CR==thisRefsList$ref]$correctedCR
+  #}
+  coreDSEworks$CR[i] <- paste(thisRefsList$ref,collapse="; ")
+  print(paste(i,"Replaced"))
 }
-
-# There's another thing about matching. Conference proceedings in particular
-# can be very different at the end. They might abbreviate venues, include
-# location information, pages numbers, etc. See refWorks with indices
-# 740-752. So here, we'll look for references that are only cited once or twice,
-# and clump up those for whom the first 80% of the string matches. This won't
-# catch anything but it will aggregate the most significant references to a
-# level where final cleaning is done by hand.
-stringsToCheck <- refWorks %>% filter(correctedFreq < 3)
-
-
-# We only want the true parent ("root") of each collection of dupes.
-# These are entries in matches where the "main" is not also a "dupe".
-mainsOnly <- (matches %>% filter(!(main %in% matches$dupe)))$main
-# Now, build a list of all the dupe collections.
-alldupelists <- unique(lapply( mainsOnly, getDupes )) # get lists of dupe branches
-# The lowest dupe index represents the most highly cited (or the first,
-# alphaetically, in the  case of a tie) version from a dupe reference list.
-rootRefs <- lapply( alldupelists, min )
-
-## Finally, this function looks at each root, sums the # refs of all the
-## children, and returns the "correct" (most used/earliest alphabetical)
-## reference. I use this to construct a corrected lookup table.
-aggSum <- function(myDupes) {
-  sum <- sum(refWorks$Freq[id=myDupes])
-  return( sum )
-}
-
-refWorks$correctedFreq <- refWorks$Freq
-refWorks$correctedRef <- refWorks$CR
-
-for( i in rootRefs ) { # for each
-  myDupes <- unique(getDupes(i))
-  refWorks$correctedFreq[id=myDupes] <- 0 # set corrected freq to 0
-  refWorks$correctedFreq[id=i] <- aggSum(myDupes) # for all but parent
-  refWorks$correctedRef[id=myDupes] <- as.character(refWorks$CR[i]) #set CR to parent
-}
-
-# report how many dups and how many actual refs
-paste( "I found", count(matches),
-       "dupes which leaves", count(refWorks) - count(matches),
-       "real refs" )
-
-# for( i in i:nrow(coreDSEworks) ) {
-#   currentRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
-#   colnames(currentRefsList) <- c("ref")
-#   typoRefs <- match(currentRefsList$ref,cleanRefsLookup$dupe)
-#   currentRefsList$ref[!is.na(typoRefs)] <-
-#     cleanRefsLookup$main[na.omit(
-#       match(currentRefsList$ref,cleanRefsLookup$dupe))]
-#   coreDSEworks$CR[i] <- paste(currentRefsList$ref,collapse="; ")
-#   print(paste(i,"Replaced"))
-# }
 
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
-                           network = "references", sep = ";")
+                           network = "references", sep = "; ")
 
-# Setting a cutoff to include only papers referenced 4 or more times in the
-# network. The clusters hold steady with cutoffs down 2 or more times
-cutoff = as.integer(count(refWorks %>% filter(Freq>3)))
+# summary results of core DSE works
+coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
+summary(coreBibAnalysis, max=10)
+
+# Map the network featured in the proposal text.
+# I set a cutoff to include only papers referenced 4 or more times in the
+# network. The clusters, however, are robust to cutoff changes
+cutoff = as.integer(count(refWorks %>% filter(Freq>2)))
 refNet=networkPlot(refMatrix, n = cutoff,
                    Title = "Co-Citation Network of Top 100 Cited Papers",
                    size.cex=TRUE, size=15, remove.multiple=FALSE,
                    remove.isolates = TRUE, labelsize=.7, edgesize = 5,
                    edges.min=0, type = "fruchterman", cluster="louvain")
+# louvain clustering seeks to "cut clusters at their joints"
 net2VOSviewer(refNet,".")
 
 # Let's check out the "brokers" in our reference network - that is, the papers
@@ -223,6 +183,4 @@ cleanRecords$CLSBEIH<- str_count(cleanRecords$CR,
                                        ignore_case = T))
 
 
-# summary results of core DSE works
-coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
-summary(coreBibAnalysis, max=10)
+
