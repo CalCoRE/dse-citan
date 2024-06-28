@@ -148,39 +148,4 @@ referenceClusterAuthors <- refNet[["cluster_res"]] %>%
   # outside of their specific cluster
   filter( btw_centrality < 100 ) %>%
   group_by(cluster) %>%
-  summarize(authors = list(word(vertex))) #paste(word(vertex), collapse = "|"))
-
-# Identify the top citers for each cluster of referenced works. Right now
-# this is just looking at first author's name (duplicates are typically self-
-# citations which are less useful to understand intellectual foundations).
-cleanRecords$CL1 <- str_count(cleanRecords$CR,
-                              regex(local_cluster_authors$vertex[1],
-                                    ignore_case = T))
-cleanRecords$CL2 <- str_count(cleanRecords$CR,
-                              regex(local_cluster_authors$vertex[2],
-                                    ignore_case = T))
-cleanRecords$CL3 <- str_count(cleanRecords$CR,
-                              regex(local_cluster_authors$vertex[3],
-                                    ignore_case = T))
-cleanRecords$CL4 <- str_count(cleanRecords$CR,
-                              regex(local_cluster_authors$vertex[4],
-                                    ignore_case = T))
-
-print("TOP CITED PAPERS IN CLUSTER 1")
-head(arrange(cleanRecords, desc(CL1)),10)[c("CL1")]
-print("TOP CORE PAPERS CITING CLUSTER 2")
-head(arrange(cleanRecords, desc(CL2), CL2),10)[c("CL2")]
-print("TOP CORE PAPERS CITING CLUSTER 3")
-head(arrange(cleanRecords, desc(CL3), CL3),10)[c("CL3")]
-print("TOP CORE PAPERS CITING CLUSTER 4")
-head(arrange(cleanRecords, desc(CL4), CL4),10)[c("CL4")]
-
-cleanRecords$CLSFARD<- str_count(cleanRecords$CR,
-                              regex('sfard',
-                                    ignore_case = T))
-cleanRecords$CLSBEIH<- str_count(cleanRecords$CR,
-                                 regex('biehler',
-                                       ignore_case = T))
-
-
-
+  summarize(authors = list(word(vertex)))
