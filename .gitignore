@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 .DS+LS Citation Analysis.Rproj
+.DS_Store
+VOSviewer.jar
