@@ -6,10 +6,8 @@
 library(agop)
 library(bibliometrix)
 library(dplyr)
-library(stringdist) # for reference cleanup
 library(stringr)
 library(textTools)
-library(data.tree)
 
 source("dse_citan.R")
 
@@ -24,96 +22,132 @@ coreDSEworks <- getCoreDSEWorks()
 refWorks <- as.data.frame(
   citations(coreDSEworks, field = "article", sep = ";")$Cited)
 
-# cement these id's in case the indices get shuffled.
-# matching info will refer to these identifiers.
-refWorks$id <- 1:nrow(refWorks)
+# The reference list has typos that cause several references
+# to be incorrectly counted and mapped.
 
-# The reference list has some disasterous typos that cause several citations
-# to be missed or mis-mapped by bibliometrix. I cleared them out using
-# stringdist to build a lookup table of typos back to the most frequently
-# cited version of each reference. Computing the pairwise string distances
+# Here I use stringdist to build a lookup table of near-dupes.
+# Computing the pairwise string distances
 # of an 8.5K matrix of refs takes hours on a typical computer, so here I'm
 # using a saved csv.
 
-matches <- read.csv("matches5.csv")
-matches$X <- NULL
+#matches <- read.csv("matches5.csv")
 
-# Uncomment the lines below to reconstruct the matrix (for example, if you
-# have updated your coreDSEworks). It takes quite a while... don't forget to
-# save your new matches!
+# NOTICE: Uncomment the lines below to reconstruct the matrix. It takes
+# hours to run on a standard laptop... don't forget to save your new matches!
+#matches <- as.data.frame(which(stringdist::stringdistmatrix(
+#  refWorks[["CR"]], refWorks[["CR"]]) < 5, arr.ind=TRUE)) %>%
+#  filter(row<col)
 
-# matches <- as.data.frame(which(stringdist::stringdistmatrix(
-#   refWorks[["CR"]], refWorks[["CR"]]) < 5, arr.ind=TRUE)) %>%
-#   filter(row<col)
+#colnames(matches) <- c("main","dupe")
 
-colnames(matches) <- c("main","dupe")
+cleanRefs <- as.data.frame(matrix(nrow=1,ncol=4))
+colnames(cleanRefs) <- c("Freq", "CR", "correctedFreq", "correctedCR")
+refWorks$counted <- FALSE
 
-# cleanRefsLookup <- data.frame()
-# Consolidate citations from dups to the main - get it done way
-# for( i in 1:nrow(matches) ) {
-#   refWorks$Freq[id=matches$main[i]] <-
-#     refWorks$Freq[id=matches$main[i]] +
-#     refWorks$Freq[id=matches$dupe[i]]
-#   print(paste("Adding",refWorks$Freq[id=matches$dupe[i]],"to",refWorks$CR[id=matches$main[i]]))
-#   refWorks$Freq[id=matches$dupe[i]] <- 0
-#   cleanRefsLookup <- rbind(cleanRefsLookup,
-#                            data.frame(refWorks$CR[id=matches$main[i]],
-#                                       refWorks$CR[id=matches$dupe[i]]))
-# }
+#note I'm matching on the first 80% of the ref. if there are multiple versions
+# of something like a textbook, this aggregates them.
+for( i in 1:nrow(refWorks) ) {
 
-# do it a tree way. first, add the match forest to a 0th tree
-#forest <- data.frame(0,matches$main)
-#colnames(forest) <- c("main","dupe")
-forest <- matches
-head(forest$main,5)
-forest <- forest %>% bind_rows(data.frame(main=0,dupe=matches$main))
-searchTree <- data.tree::FromDataFrameNetwork(forest)
+  # is there any meat to this entry
+  compareTo <- gsub('[\\:\\(\\)+\\?\\|]','',refWorks$CR[i])
 
-## USE THE TREE TO GET CHILDREN OF EACH MAIN ITEM
+  if( str_length(compareTo) > 25) {
 
-getAllDupRefs <- function(node,l=list()) {
-  if( length(node$children) > 0 ) { # check for more kiddos
-    l <- lapply(node$children, getAllDupRefs)
+    # get the group of like refs that haven't already been captured
+    refGroup <- refWorks %>% filter(counted==FALSE) %>%
+      filter( gsub('[\\:\\(\\)+\\?\\|]','',CR) %like% substr(
+        compareTo,0,str_length(compareTo)*.75) )
+    print(i)
+
+    # if this ref has any like entries let's consolidate them
+    if( nrow(refGroup) > 0 ) {
+      print(i)
+      #make the most popular one parent
+      refGroup$correctedCR <- refGroup$CR[1]
+
+      #zero out cite count of children and add to parent
+      refGroup$correctedFreq <- 0
+      refGroup$correctedFreq[1] <- sum(refGroup$Freq)
+
+      #pull these refWorks out of the list waiting to be grouped
+      refWorks$counted[refWorks$CR %in% refGroup$CR] <- TRUE
+
+      #add the adjusted group entries to cleanRefs
+      cleanRefs <- bind_rows(cleanRefs, refGroup)
+    } else {
+      refWorks$counted[i] <- TRUE
+    }
+  } else {
+    refWorks$counted[i] <- TRUE
   }
-  return( distinct(as.data.frame(unname(append(unlist(l),node$name)))) )
 }
 
-dupList <- function(node) {
-  myList <- getAllDupRefs(searchTree[[node]])
-  return( myList )
+
+
+# matching faulty duplicates should be transitive, but is not yet:
+# The matches table may identify B as a dupe of A and C as a dept of B, without
+# a direct link between A and C. Below, I climb through parent/child pairs
+# as trees to generate a list of transitively matching duplicates.
+getDupes <- function(mainRefIndex,l=list()) {
+  if( any(matches %>% filter(main == mainRefIndex ) ) ) {
+    children <- (matches %>% filter(main == mainRefIndex))$dupe
+    l <- lapply(children, getDupes)
+  }
+  return( unname(append(unlist(l),mainRefIndex)))
 }
 
-## USE THIS TO SUM THE CITES
-## USE THIS TO ASSIGN THE MOST FREQUENT CR
-agg <- function(node) {
-  myDupList <- dupList(node)
-  colnames(myDupList) <- "refId"
-  getSet <- refWorks %>% filter(id %in% myDupList$refId )
-  sum <- sum(getSet$Freq)
-  CR <- refWorks$CR[id=min(getSet$id)]
-  return( c(sum, as.character(CR) ) )
+# There's another thing about matching. Conference proceedings in particular
+# can be very different at the end. They might abbreviate venues, include
+# location information, pages numbers, etc. See refWorks with indices
+# 740-752. So here, we'll look for references that are only cited once or twice,
+# and clump up those for whom the first 80% of the string matches. This won't
+# catch anything but it will aggregate the most significant references to a
+# level where final cleaning is done by hand.
+stringsToCheck <- refWorks %>% filter(correctedFreq < 3)
+
+
+# We only want the true parent ("root") of each collection of dupes.
+# These are entries in matches where the "main" is not also a "dupe".
+mainsOnly <- (matches %>% filter(!(main %in% matches$dupe)))$main
+# Now, build a list of all the dupe collections.
+alldupelists <- unique(lapply( mainsOnly, getDupes )) # get lists of dupe branches
+# The lowest dupe index represents the most highly cited (or the first,
+# alphaetically, in the  case of a tie) version from a dupe reference list.
+rootRefs <- lapply( alldupelists, min )
+
+## Finally, this function looks at each root, sums the # refs of all the
+## children, and returns the "correct" (most used/earliest alphabetical)
+## reference. I use this to construct a corrected lookup table.
+aggSum <- function(myDupes) {
+  sum <- sum(refWorks$Freq[id=myDupes])
+  return( sum )
 }
 
-testResult <- forest %>% filter(main==0)
-testResult$Freq <- agg(as.character(testResult$dupe))
+refWorks$correctedFreq <- refWorks$Freq
+refWorks$correctedRef <- refWorks$CR
 
-colnames(cleanRefsLookup) <- c("main","dupe")
+for( i in rootRefs ) { # for each
+  myDupes <- unique(getDupes(i))
+  refWorks$correctedFreq[id=myDupes] <- 0 # set corrected freq to 0
+  refWorks$correctedFreq[id=i] <- aggSum(myDupes) # for all but parent
+  refWorks$correctedRef[id=myDupes] <- as.character(refWorks$CR[i]) #set CR to parent
+}
 
 # report how many dups and how many actual refs
 paste( "I found", count(matches),
        "dupes which leaves", count(refWorks) - count(matches),
        "real refs" )
 
-for( i in i:nrow(coreDSEworks) ) {
-  currentRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
-  colnames(currentRefsList) <- c("ref")
-  typoRefs <- match(currentRefsList$ref,cleanRefsLookup$dupe)
-  currentRefsList$ref[!is.na(typoRefs)] <-
-    cleanRefsLookup$main[na.omit(
-      match(currentRefsList$ref,cleanRefsLookup$dupe))]
-  coreDSEworks$CR[i] <- paste(currentRefsList$ref,collapse="; ")
-  print(paste(i,"Replaced"))
-}
+# for( i in i:nrow(coreDSEworks) ) {
+#   currentRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
+#   colnames(currentRefsList) <- c("ref")
+#   typoRefs <- match(currentRefsList$ref,cleanRefsLookup$dupe)
+#   currentRefsList$ref[!is.na(typoRefs)] <-
+#     cleanRefsLookup$main[na.omit(
+#       match(currentRefsList$ref,cleanRefsLookup$dupe))]
+#   coreDSEworks$CR[i] <- paste(currentRefsList$ref,collapse="; ")
+#   print(paste(i,"Replaced"))
+# }
 
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",

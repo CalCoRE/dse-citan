@@ -42,15 +42,3 @@ getCoreDSEWorks <- function(scopusPath="./data/scopus.csv",
 
   return(coreDSEworks)
 }
-
-getMatches <- function(refs,dist=5){
-  # first, get the rows and columns of items that closely but not exactly match
-  # be patient, this is a monster. Full refs list of 8592
-  # yields 595 dupe matches. Mains are lower indices = more frequently ref'd
-  # TODO: these need a tree structure since some typos are typos of typos.
-  matches <- as.data.frame(which(stringdist::stringdistmatrix(
-    refs[["CR"]], refs[["CR"]]) < dist, arr.ind=TRUE)) %>%
-    filter(row<col)
-  colnames(matches) <- c("main","dupe")
-  return( matches %>% arrange(matches,main) )
-}
