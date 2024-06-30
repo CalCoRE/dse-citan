@@ -66,7 +66,7 @@ shortname <- tolower(paste0(
 cleanRefLookup$shortname <- gsub(',','',shortname)
 
 # clean up to get to the real work
-rm(shortname,compareTo,i)
+rm(shortname,i)
 
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
@@ -133,10 +133,10 @@ getClusterHub <- function(i) {
 }
 
 print("Cluster 1: Popular, insulated members")
-getClusterHub(1) %>% head(5)
+getClusterHub(1) %>% head(5) %>% select(correctedFreq, correctedCR)
 
 print("Cluster 2: Popular, insulated members")
-getClusterHub(2) %>% head(5)
+getClusterHub(2) %>% head(5) %>% select(correctedFreq, correctedCR)
 
 print("Cluster 3: Popular, insulated members")
-getClusterHub(3) %>% head(5)
+getClusterHub(3) %>% head(5) %>% select(correctedFreq, correctedCR)
