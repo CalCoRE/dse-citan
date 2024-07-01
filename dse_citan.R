@@ -65,29 +65,30 @@ shortname <- tolower(paste0(
   str_sub(cleanRefLookup$correctedCR,-5,-1))) # year
 cleanRefLookup$shortname <- gsub(',','',shortname)
 
-# for each distinct shortname
-parentRefShortnames <- as.data.frame(cleanRefLookup %>% distinct(shortname))
-# note this is a great place to identify lingering duplicates, check
-# especially for excessive repeats
-for( i in 1:nrow(parentRefShortnames) ) {
-  # get all nonzero-after-correction records with this shortname
-  records <- cleanRefLookup %>% 
-    filter(shortname %in% parentRefShortnames$shortname[i] ) %>% 
-    filter(correctedFreq > 0)
-  # if there's more than one record, append numbers to identify each
-  if( count( records ) > 1 ) {
-    indices <- which(
-      cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
-        cleanRefLookup$correctedFreq > 0, arr.ind = TRUE)
-    append = 1
-    for( index in indices ) {
-      print(index)
-      cleanRefLookup[index,]$shortname <- paste0( 
-        cleanRefLookup$shortname[index] , "-", append )
-      append <- append + 1
-    }
-  }
-}
+# for each distinct shortname - holding off for now, but may be needed to
+# link mutiple author-year refs
+# parentRefShortnames <- as.data.frame(cleanRefLookup %>% distinct(shortname))
+# # note this is a great place to identify lingering duplicates, check
+# # especially for excessive repeats
+# for( i in 1:nrow(parentRefShortnames) ) {
+#   # get all nonzero-after-correction records with this shortname
+#   records <- cleanRefLookup %>% 
+#     filter(shortname %in% parentRefShortnames$shortname[i] ) %>% 
+#     filter(correctedFreq > 0)
+#   # if there's more than one record, append numbers to identify each
+#   if( count( records ) > 1 ) {
+#     indices <- which(
+#       cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
+#         cleanRefLookup$correctedFreq > 0, arr.ind = TRUE)
+#     append = 1
+#     for( index in indices ) {
+#       print(index)
+#       cleanRefLookup[index,]$shortname <- paste0( 
+#         cleanRefLookup$shortname[index] , "-", append )
+#       append <- append + 1
+#     }
+#   }
+# }
 
 coreDSEworks$shortnameRefs <- ""
 # create a search string to match coreDSEworks to refNet shortnames. 
@@ -95,7 +96,6 @@ for( i in 1:nrow(coreDSEworks) ) {
   # pull apart the refList for this core work into a dataframe
   records <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
   colnames(records) <- c("ref")
-  print(records)
   
   # use cleanRefs lookup to replace duplicate records with main
   records[] <- cleanRefLookup$shortname[match(unlist(records), cleanRefLookup$CR)]
@@ -105,15 +105,26 @@ for( i in 1:nrow(coreDSEworks) ) {
 }
 
 # clean up to get to the real work
-rm(shortname,i,records,parentRefShortnames)
+rm(shortname,i,index, indices,records,parentRefShortnames)
+
+###################### PART 1 ##########################
+##                                                    ##
+##            The basic bibliometrics                 ##
+##                                                    ##
+########################################################
+# summary results of core DSE works
+coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
+summary(coreBibAnalysis, max=10)
+
+###################### PART 2a #########################
+##                                                    ##
+##            Construct the ref network               ##
+##                                                    ##
+########################################################
 
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
                            network = "references", sep = "; ")
-
-# summary results of core DSE works
-coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
-summary(coreBibAnalysis, max=10)
 
 # Map the network featured in the proposal text.
 # I set a cutoff to include only papers referenced 3 or more times in the
@@ -129,6 +140,12 @@ refNet=networkPlot(refMatrix, n = cutoff,
 # to reproduce the visualization featured in the proposal submission,
 # set attraction=2, repulsion=0 and set size variation to 0 within VOSviewer
 net2VOSviewer(refNet,".")
+
+###################### PART 2b #########################
+##                                                    ##
+##            Identify reference brokers              ##
+##                                                    ##
+########################################################
 
 # Let's check out the top "brokers" in our reference network - that is,
 # the papers that are cited alongside works from otherwise distinct clusters.
@@ -149,6 +166,12 @@ brokers <- cleanRefLookup %>%
   filter( shortname %in% refBrokers$vertex )
 brokers$CR %>% head(10)
 
+###################### PART 2c #########################
+##                                                    ##
+##              Identify reference hubs               ##
+##                                                    ##
+########################################################
+
 # Now, look for "core" cluster membership of the referenced papers. These are
 # papers that have low betweenness centrality. Examining only these papers that
 # are cited only with others in their community, but not more broadly, can
@@ -158,7 +181,7 @@ brokers$CR %>% head(10)
 referenceClusterAuthors <- refNet[["cluster_res"]] %>%
   # restrict this to only authors of papers that are not very connected
   # outside of their specific cluster
-  filter( btw_centrality < 75 ) %>%
+  filter( btw_centrality < 50 ) %>%
   group_by(cluster) %>%
   summarize(authors = list(vertex))
 
@@ -171,11 +194,57 @@ getClusterHub <- function(i) {
     arrange( desc(correctedFreq) ) )
 }
 
-print("Cluster 1: Popular, insulated members")
-getClusterHub(1) %>% head(5) %>% select(correctedFreq, correctedCR)
+for( i in 1:nrow(distinct(refNet[["cluster_res"]], cluster)) ) {
+  print(paste("Cluster", i, "Popular, insulated members") )
+  hubs <- getClusterHub(i) 
+  print( hubs %>% head(5) %>% select(correctedFreq, correctedCR) )
+}
 
-print("Cluster 2: Popular, insulated members")
-getClusterHub(2) %>% head(5) %>% select(correctedFreq, correctedCR)
+###################### PART 2d #########################
+##                                                    ##
+## Identify core works that reference across clusters ##
+##                                                    ##
+########################################################
 
-print("Cluster 3: Popular, insulated members")
-getClusterHub(3) %>% head(5) %>% select(correctedFreq, correctedCR)
+## for each coreDSEwork, identify which cluster each
+## paper they are referencing is from. ignore reference
+## works with very high betweenness centrality (those are)
+## the ones that are often reference with others anyway
+
+## The below code returns all the refNet info for mapped refs. Keeping
+## it here in case it becomes useful. Instead, I'm just gonna return a
+## list of the clusters to determine each core work's dependence on
+## each cluster.
+
+# i can probably do this without looping with an apply of some kind...
+for( i in 1:nrow(coreDSEworks) ) {
+  coreDSEworks$refInfo[i] <- paste(refNet[["cluster_res"]] %>% 
+       filter( str_detect(vertex, coreDSEworks$shortnameRefs[i]) == TRUE ) %>%
+    select(cluster))
+}
+
+# OK! We have a list of the refnet clusters cited by each paper, for each of
+# that paper's references. (remember that as written, refnet only includes the
+# highest cited papers, so there are lots of nulls too.) Now we can find out
+# which papers cite broadly (evenly across clusters) versus which are more 
+# insular (citing only from one cluster).
+
+# for our hub and broker analyses, let's just look at the papers that are 
+# citing at least 15 works within the refnet. Again, remember that refnet 
+# does not include all documented references unless you adjusted it above. 
+# if you did adjust it, you may want to adjust these selection methods.
+
+coreCitingWorks <- coreDSEworks %>% 
+  filter( length(coreDSEworks$refInfo) > 15 )
+
+# next up: identify works that cite all three. My guess is the records
+# will be sparse enough that for now, I can eyeball from there.
+            
+
+###################### PART 2e #########################
+##                                                    ##
+## Identify core works that reference within clusters ##
+##                                                    ##
+########################################################
+
+# list by desc percent of items in each cluster
