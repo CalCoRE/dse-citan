@@ -37,6 +37,22 @@ charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,]'
 # back to whatever the most popular form of the reference is.
 cleanRefLookup <- mapCleanRefs(refWorks,charExcludeList)
 
+# the moment of truth: the less common duplicates of references in the
+# actual reference list of coreDSEworks are replaced with the
+# most common form: so citations are aggregated, linked, and mapped properly.
+for( i in 1:nrow(coreDSEworks) ) {
+  # pull apart the refList for this core work into a dataframe
+  thisRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
+  colnames(thisRefsList) <- c("ref")
+  thisRefsList$ref <- gsub(charExcludeList,'',thisRefsList$ref)
+  
+  # use cleanRefs lookup to replace duplicate records with main
+  thisRefsList[] <- cleanRefLookup$correctedCR[match(unlist(thisRefsList), cleanRefLookup$CR)]
+  
+  # stitch it all back together and put it back in the core work
+  coreDSEworks$CR[i] <- paste(thisRefsList$ref,collapse="; ")
+}
+
 # let's approximate the shortnames of the references so we can map
 # them to the network analyses below. Note there will
 # be duplicate shortnames for some records, but we're only interested in the
@@ -49,26 +65,20 @@ shortname <- tolower(paste0(
   str_sub(cleanRefLookup$correctedCR,-5,-1))) # year
 cleanRefLookup$shortname <- gsub(',','',shortname)
 
-parentRefShortnames <- as.data.frame(cleanRefLookup %>% distinct(shortname))
 # for each distinct shortname
+parentRefShortnames <- as.data.frame(cleanRefLookup %>% distinct(shortname))
 # note this is a great place to identify lingering duplicates, check
 # especially for excessive repeats
 for( i in 1:nrow(parentRefShortnames) ) {
-  # get all nonzero records with this shortname
-  #print(i)
+  # get all nonzero-after-correction records with this shortname
   records <- cleanRefLookup %>% 
     filter(shortname %in% parentRefShortnames$shortname[i] ) %>% 
     filter(correctedFreq > 0)
-  # if there's more than one 
+  # if there's more than one record, append numbers to identify each
   if( count( records ) > 1 ) {
-    print( paste0( records$shortname , "-", rownames(records) ) )
-    #print( which(
-    #  cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
-    #    cleanRefLookup$correctedFreq > 0, arr.ind = TRUE) )
     indices <- which(
       cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
         cleanRefLookup$correctedFreq > 0, arr.ind = TRUE)
-    #print(indices)
     append = 1
     for( index in indices ) {
       print(index)
@@ -76,31 +86,26 @@ for( i in 1:nrow(parentRefShortnames) ) {
         cleanRefLookup$shortname[index] , "-", append )
       append <- append + 1
     }
-    # cleanRefLookup$shortnames[which(
-    #   cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
-    #     cleanRefLookup$correctedFreq > 0, arr.ind = TRUE)] <- 
-    #   paste0( records$shortname , "-", rownames(records) )
   }
 }
 
-# the moment of truth: the less common duplicates of references in the
-# actual reference list of coreDSEworks are replaced with the
-# most common form: so citations are aggregated, linked, and mapped properly.
+coreDSEworks$shortnameRefs <- ""
+# create a search string to match coreDSEworks to refNet shortnames. 
 for( i in 1:nrow(coreDSEworks) ) {
   # pull apart the refList for this core work into a dataframe
-  thisRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
-  colnames(thisRefsList) <- c("ref")
-  thisRefsList$ref <- gsub(charExcludeList,'',thisRefsList$ref)
-
+  records <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
+  colnames(records) <- c("ref")
+  print(records)
+  
   # use cleanRefs lookup to replace duplicate records with main
-  thisRefsList[] <- cleanRefLookup$correctedCR[match(unlist(thisRefsList), cleanRefLookup$CR)]
-
+  records[] <- cleanRefLookup$shortname[match(unlist(records), cleanRefLookup$CR)]
+  
   # stitch it all back together and put it back in the core work
-  coreDSEworks$CR[i] <- paste(thisRefsList$ref,collapse="; ")
+  coreDSEworks$shortnameRefs[i] <- paste(records$ref,collapse="|")
 }
 
 # clean up to get to the real work
-rm(shortname,i)
+rm(shortname,i,records,parentRefShortnames)
 
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
