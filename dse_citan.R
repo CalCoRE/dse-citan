@@ -105,7 +105,7 @@ for( i in 1:nrow(coreDSEworks) ) {
 }
 
 # clean up to get to the real work
-rm(shortname,i,index, indices,records,parentRefShortnames)
+rm(shortname,i)
 
 ###################### PART 1 ##########################
 ##                                                    ##

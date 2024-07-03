@@ -6,7 +6,7 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
   refWorks <- refWorks %>% 
     filter(CR != "JOURNAL OF STATISTICS EDUCATION, 27, 3, PP. 265-274")
 
-  refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) #NEW
+  refWorks$CR <- gsub(charExcludeList,'',refWorks$CR)
   
   cleanRefLookup <- as.data.frame(matrix(ncol=4))
   colnames(cleanRefLookup) <- c("Freq", "CR", "correctedFreq", "correctedCR")
@@ -15,8 +15,8 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
   # load up some manual duplications i'd like to fix
   # if you are updating this analysis, the biggest offender are references with
   # very large author lists, because these lists are treated differently by 
-  # different communities. luckily, these tend to be rare so identify them,
-  # clean them, and move on with your life
+  # different communities. you can print out the likely dupes during
+  # the shortnaming process in dse_citan.R
   manual <- read.csv("manualdupes.txt", sep=";")
   manual$CR <- gsub(charExcludeList,'',manual$CR)
   manual$correctedCR <- gsub(charExcludeList,'',manual$correctedCR)
