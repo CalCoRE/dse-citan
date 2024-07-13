@@ -2,7 +2,7 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
   print("Be patient. Maybe go grab a coffee.")
   
   # fix this one record resulting from a wayward semicolon
-  # this part of the reference is reintroduced to its family via manualdupes
+  # this part of the reference is reintroduced to its parent via manualdupes
   refWorks <- refWorks %>% 
     filter(CR != "JOURNAL OF STATISTICS EDUCATION, 27, 3, PP. 265-274")
 
@@ -20,7 +20,7 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
   manual <- read.csv("manualdupes.txt", sep=";")
   manual$CR <- gsub(charExcludeList,'',manual$CR)
   manual$correctedCR <- gsub(charExcludeList,'',manual$correctedCR)
-  
+    
   # I'm matching on the first 70% of the ref. if there are multiple versions
   # of something like a textbook, this would aggregate them. It looks at the
   # first part since the last part is most likely where reasonable differences
@@ -35,14 +35,16 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
     # if there is any meat to the entry
     if( str_length(compareTo) > 40) {
       
-      # get the group of like refs that haven't already been captured
+      # get the group of manual refs
+      manualRefs <- manual %>% filter(correctedCR == compareTo)
+      manualGroup <- refWorks %>% filter(counted==FALSE) %>%
+        filter(gsub(charExcludeList,'',CR) %in% manualRefs$CR) 
+      
+      # get the group of like refs that haven't already been captured manually
       refGroup <- refWorks %>% filter(counted==FALSE) %>%
         filter( gsub(charExcludeList,'',CR) %like% substr(
-          compareTo,0,str_length(compareTo)*.70) )
-      
-      manualRefs <- manual %>% filter(correctedCR == compareTo)
-      manualGroup <- refWorks %>% 
-        filter(gsub(charExcludeList,'',CR) %in% manualRefs$CR)
+          compareTo,0,str_length(compareTo)*.70) ) %>%
+        filter( !(gsub(charExcludeList,'',CR) %in% manualRefs$CR) )
       
       refGroup <- rbind(refGroup,manualGroup)
       
@@ -68,6 +70,6 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
       refWorks$counted[i] <- TRUE #ignore in future groupings
     }
     setTxtProgressBar(pb,i)
-  } 
+  }
   return( cleanRefLookup )
 }
