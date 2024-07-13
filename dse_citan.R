@@ -6,10 +6,10 @@
 # updated Jun 27, 2024
 
 library(agop)
-library(bibliometrix)
 library(dplyr)
 library(stringr)
 library(textTools)
+library(bibliometrix)
 
 # this script expects the working directory to be this source file's location
 source("read_works.R")
@@ -29,9 +29,9 @@ refWorks <- as.data.frame(
 # NOTE: If cleaning breaks, your cleanRefs look wonky, or you find
 # unreasonably similar records when perusing results, there is probably
 # a new weird character to blame. Add it here.
-charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,]'
+charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.]'
 
-# The reference list has typos abd different ref styles that cause references
+# The reference list has typos and different ref styles that cause references
 # to be incorrectly counted and mapped. Below I'm making a lookup
 # table that maps all the less common (but matching) reference formats
 # back to whatever the most popular form of the reference is.
@@ -67,28 +67,33 @@ cleanRefLookup$shortname <- gsub(',','',shortname)
 
 # for each distinct shortname - holding off for now, but may be needed to
 # link mutiple author-year refs
-# parentRefShortnames <- as.data.frame(cleanRefLookup %>% distinct(shortname))
-# # note this is a great place to identify lingering duplicates, check
-# # especially for excessive repeats
-# for( i in 1:nrow(parentRefShortnames) ) {
-#   # get all nonzero-after-correction records with this shortname
-#   records <- cleanRefLookup %>% 
-#     filter(shortname %in% parentRefShortnames$shortname[i] ) %>% 
-#     filter(correctedFreq > 0)
-#   # if there's more than one record, append numbers to identify each
-#   if( count( records ) > 1 ) {
-#     indices <- which(
-#       cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
-#         cleanRefLookup$correctedFreq > 0, arr.ind = TRUE)
-#     append = 1
-#     for( index in indices ) {
-#       print(index)
-#       cleanRefLookup[index,]$shortname <- paste0( 
-#         cleanRefLookup$shortname[index] , "-", append )
-#       append <- append + 1
-#     }
-#   }
-# }
+parentRefShortnames <- as.data.frame(cleanRefLookup %>% distinct(shortname))
+
+# note this is a great place to identify lingering duplicates, check
+# especially for excessive repeats
+for( i in 1:nrow(parentRefShortnames) ) {
+  # get all nonzero-after-correction records with this shortname
+  records <- cleanRefLookup %>%
+    filter(shortname %in% parentRefShortnames$shortname[i] ) %>%
+    filter(correctedFreq > 0)
+  # if there's more than one record, append numbers to identify each
+  if( count( records ) > 1 ) {
+    indices <- which(
+      cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
+        cleanRefLookup$correctedFreq > 0, arr.ind = TRUE)
+    append = 1
+    for( index in indices ) {
+      # if there are more than three records, let us know the name to check
+      # for dupes
+      if(append > 3) {
+        print(cleanRefLookup[index,]$shortname)
+      }
+      cleanRefLookup[index,]$shortname <- paste0(
+        cleanRefLookup$shortname[index] , "-", append )
+      append <- append + 1
+    }
+  }
+}
 
 coreDSEworks$shortnameRefs <- ""
 # create a search string to match coreDSEworks to refNet shortnames. 
@@ -218,7 +223,7 @@ for( i in 1:nrow(distinct(refNet[["cluster_res"]], cluster)) ) {
 
 # i can probably do this without looping with an apply of some kind...
 for( i in 1:nrow(coreDSEworks) ) {
-  coreDSEworks$refInfo[i] <- paste(refNet[["cluster_res"]] %>% 
+  coreDSEworks$refInfo[i] <- list(refNet[["cluster_res"]] %>% 
        filter( str_detect(vertex, coreDSEworks$shortnameRefs[i]) == TRUE ) %>%
     select(cluster))
 }
@@ -248,3 +253,4 @@ coreCitingWorks <- coreDSEworks %>%
 ########################################################
 
 # list by desc percent of items in each cluster
+
