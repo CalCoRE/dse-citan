@@ -10,10 +10,12 @@ library(dplyr)
 library(stringr)
 library(textTools)
 library(bibliometrix)
+library(visNetwork)
 
 # this script expects the working directory to be this source file's location
-source("read_works.R")
-source("clean_refs.R")
+source("scripts/read_works.R")
+source("scripts/clean_refs.R")
+source("scripts/shortnames.R")
 
 # Records last updated 6/14/24.
 # Query inputted to Scopus and WoS were "data science education" in the
@@ -26,91 +28,20 @@ coreDSEworks <- getCoreDSEWorks()
 refWorks <- as.data.frame(
   citations(coreDSEworks, field = "article", sep = ";")$Cited)
 
-# NOTE: If cleaning breaks, your cleanRefs look wonky, or you find
-# unreasonably similar records when perusing results, there is probably
-# a new weird character to blame. Add it here.
-charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.]'
-
 # The reference list has typos and different ref styles that cause references
 # to be incorrectly counted and mapped. Below I'm making a lookup
 # table that maps all the less common (but matching) reference formats
 # back to whatever the most popular form of the reference is.
+charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.]'
 cleanRefLookup <- mapCleanRefs(refWorks,charExcludeList)
 
-# the moment of truth: the less common duplicates of references in the
-# actual reference list of coreDSEworks are replaced with the
-# most common form: so citations are aggregated, linked, and mapped properly.
-for( i in 1:nrow(coreDSEworks) ) {
-  # pull apart the refList for this core work into a dataframe
-  thisRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
-  colnames(thisRefsList) <- c("ref")
-  thisRefsList$ref <- gsub(charExcludeList,'',thisRefsList$ref)
-  
-  # use cleanRefs lookup to replace duplicate records with main
-  thisRefsList[] <- cleanRefLookup$correctedCR[match(unlist(thisRefsList), cleanRefLookup$CR)]
-  
-  # stitch it all back together and put it back in the core work
-  coreDSEworks$CR[i] <- paste(thisRefsList$ref,collapse="; ")
-}
+# Replace refs list in the core works with cleaned refs
+coreDSEworks <- cleanRefs(coreDSEworks,cleanRefLookup)
 
-# let's approximate the shortnames of the references so we can map
-# them to the network analyses below. Note there will
-# be duplicate shortnames for some records, but we're only interested in the
-# most popular works. by matching to any record with this simplified shortname,
-# i also catch lingering duplicate records for the more influential works
-# shaping the field, which i add to the manual cleaning file over time.
-shortname <- tolower(paste0(
-  word(cleanRefLookup$correctedCR), " ",  # first word (last name)
-  word(cleanRefLookup$correctedCR,2),     # second word (first initial)
-  str_sub(cleanRefLookup$correctedCR,-5,-1))) # year
-cleanRefLookup$shortname <- gsub(',','',shortname)
+# create shortnames and add them as a new ref list to coreDSEworks
+cleanRefLookup <- refShortNames(cleanRefLookup)
+coreDSEworks <- coreShortNames(coreDSEworks,cleanRefLookup)
 
-# for each distinct shortname - holding off for now, but may be needed to
-# link mutiple author-year refs
-parentRefShortnames <- as.data.frame(cleanRefLookup %>% distinct(shortname))
-
-# note this is a great place to identify lingering duplicates, check
-# especially for excessive repeats
-for( i in 1:nrow(parentRefShortnames) ) {
-  # get all nonzero-after-correction records with this shortname
-  records <- cleanRefLookup %>%
-    filter(shortname %in% parentRefShortnames$shortname[i] ) %>%
-    filter(correctedFreq > 0)
-  # if there's more than one record, append numbers to identify each
-  if( count( records ) > 1 ) {
-    indices <- which(
-      cleanRefLookup$shortname == parentRefShortnames$shortname[i] &
-        cleanRefLookup$correctedFreq > 0, arr.ind = TRUE)
-    append = 1
-    for( index in indices ) {
-      # if there are more than three records, let us know the name to check
-      # for dupes
-      if(append > 3) {
-        print(cleanRefLookup[index,]$shortname)
-      }
-      cleanRefLookup[index,]$shortname <- paste0(
-        cleanRefLookup$shortname[index] , "-", append )
-      append <- append + 1
-    }
-  }
-}
-
-coreDSEworks$shortnameRefs <- ""
-# create a search string to match coreDSEworks to refNet shortnames. 
-for( i in 1:nrow(coreDSEworks) ) {
-  # pull apart the refList for this core work into a dataframe
-  records <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
-  colnames(records) <- c("ref")
-  
-  # use cleanRefs lookup to replace duplicate records with main
-  records[] <- cleanRefLookup$shortname[match(unlist(records), cleanRefLookup$CR)]
-  
-  # stitch it all back together and put it back in the core work
-  coreDSEworks$shortnameRefs[i] <- paste(records$ref,collapse="|")
-}
-
-# clean up to get to the real work
-rm(shortname,i)
 
 ###################### PART 1 ##########################
 ##                                                    ##
