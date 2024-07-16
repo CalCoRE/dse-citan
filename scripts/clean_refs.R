@@ -17,7 +17,7 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
   # very large author lists, because these lists are treated differently by 
   # different communities. you can print out the likely dupes during
   # the shortnaming process in dse_citan.R
-  manual <- read.csv("manualdupes.txt", sep=";")
+  manual <- read.csv("./data/manualdupes.txt", sep=";")
   manual$CR <- gsub(charExcludeList,'',manual$CR)
   manual$correctedCR <- gsub(charExcludeList,'',manual$correctedCR)
     
@@ -72,4 +72,23 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
     setTxtProgressBar(pb,i)
   }
   return( cleanRefLookup )
+}
+
+cleanRefs <- function(coreDSEworks,cleanRefLookup) {
+  # the moment of truth: the less common duplicates of references in the
+  # actual reference list of coreDSEworks are replaced with the
+  # most common form: so citations are aggregated, linked, and mapped properly.
+  for( i in 1:nrow(coreDSEworks) ) {
+    # pull apart the refList for this core work into a dataframe
+    thisRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
+    colnames(thisRefsList) <- c("ref")
+    thisRefsList$ref <- gsub(charExcludeList,'',thisRefsList$ref)
+    
+    # use cleanRefs lookup to replace duplicate records with main
+    thisRefsList[] <- cleanRefLookup$correctedCR[match(unlist(thisRefsList), cleanRefLookup$CR)]
+    
+    # stitch it all back together and put it back in the core work
+    coreDSEworks$CR[i] <- paste(thisRefsList$ref,collapse="; ")
+  }
+  return( coreDSEworks )
 }
