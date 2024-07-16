@@ -1,0 +1,153 @@
+---
+title: "dse-citan"
+author: "Michelle Hoda Wilkerson"
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+editor: visual
+theme: lux
+bibliography: references.bib
+csl: apa-6th-edition.csl
+---
+
+```{r}
+#| label: load-packages-and-scripts
+#| echo: false
+#| include: false
+library(agop)
+library(dplyr)
+library(stringr)
+library(textTools)
+library(bibliometrix)
+
+library(DT)
+```
+
+# Introduction
+
+As readers of HDSR know well, there is wide diversity in who is involved in data science education research and how it is conceptualized. In just the past year, we have learned much about this landscape. Mike et al [-@mike2023] leveraged k-means clustering techniques to classify a collection of over 1,000 data science education papers to identify what are key topics of this emerging field, given its multidisciplinary nature. They identified five key foci: curriculum; pedagogy; STEM skills; domain adaptation; and social aspects. Rosenberg and Jones [-@rosenberg2024] presented an analysis of three recent journal special issues (a total of 28 papers and their shared references) dedicated more specifically to the study of learning in K-12 data science. They found that despite their shared topical focus, each special issue reflected distinct orientations toward the field and with different degrees of cohesiveness in the works cited within each.
+
+Here, I propose a contribution that would represent a "meso" level analysis that connects reference patterns of the sort examined in Rosenberg & Jones [-@rosenberg2024] to emerging topics of the sort illuminated by Mike et al [-@mike2023]. It does so through a mixed-methods investigation of 284 works that identify themselves in their title, keywords, or abstract as concerned with "data science education," and the reference co-citation network of over 8,000 works that form the foundations of that scholarship. Leveraging bibliometric and network analytic methods, I have identified distinct and conceptually coherent clusters of foundational work upon which this emerging literature is built. These clusters map to specific disciplinary communities and publication venues. Through additional qualitative content analysis, I can trace these relationships to specific communities and topics reflected in the current literature.
+
+# Background
+
+A number of recent works have explored the proliferation of "data science education" across multiple fields.
+
+# Method
+
+Reference co-citation network analysis is the examination of the structure of works that are cited by a core corpus of works, in order to understand the foundations of that corpus.
+
+### Data Sources
+
+#### Core DSE Works
+
+To conduct this review, I selected an intentionally narrow set of core works: publications that are indexed in either Scopus or Clarivate Web of Science that include the specific phrase "data science education" in the title, abstract, or keywords. As of July 14, 2024, this query yielded
+
+```{r}
+#| label: read-core-works
+source("scripts/read_works.R")
+coreDSEworks <- getCoreDSEWorks("data/scopus.csv","data/wos.txt")
+
+datatable(coreDSEworks[
+  sample(1:nrow(coreDSEworks)), 
+  c(3,1,2,4)],
+  rownames=FALSE,
+  options=list(pageLength=5)
+  )
+```
+
+#### Reference Works
+
+Both Scopus and the Clairviate/Web of Science databases include the full reference lists of each record. Using the `bibliometrix citations()` function. we construct a new data frame refWorks to represent these reference papers.
+
+```{r}
+#| label: extract-reference-works
+refWorks <- as.data.frame(
+  citations(coreDSEworks, field = "article", sep = ";")$Cited)
+
+datatable(refWorks) %>% head(5)
+```
+
+### Cleaning and Consolidating Reference Works
+
+The reference lists included in Scopus and WoS databases are text-only, and the reference formats that are used across the disciplines are quite different. Therefore, the process of cleaning the refWorks list to ensure that references are matched and properly counted and linked is not trivial. Here, I will briefly summarize my processes for cleaning the dataset; please review the clean_refs script and the manualdupes text file to get a better sense of this process.
+
+```{r}
+#| label: clean-reference-works
+source("scripts/clean_refs.R")
+charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.]'
+#cleanRefLookup <- mapCleanRefs(refWorks,charExcludeList)
+#cleanRefLookup <- a saved csv, but users can switch back if they want
+```
+
+We then use the cleaned refs to replace the reference lists of the coreDSEworks.
+
+```{r}
+#| label: clean-reference-lists-in-core-works
+#coreDSEworks <- cleanRefs(coreDSEworks,cleanRefLookup)
+```
+
+### Mapping Between Core and Reference Works
+
+Finally, we generate shortnames for each reference, using the same format that will be used by the bibliometrix analysis package: author last name, author first initial(s), year of publication. This allows us to more easily explore the relationships between Core DSE Works and the underlying reference networks. For example, in Section X, I use shortnames to identify which Core DSE Works draw predominantly from only one of the clusters identified in the reference work network analysis, versus those that draw in a more balanced way from all three clusters.
+
+```{r}
+#| label: generate-shortnames
+source("scripts/shortnames.R")
+#cleanRefLookup <- refShortNames(cleanRefLookup)
+#coreDSEworks <- coreShortNames(coreDSEworks,cleanRefLookup)
+```
+
+In cases where more than one reference exists from the same first author in the same year, the shortnames are appended with a number in order to citation frequency. For example, below are the shortnames for multiple reference works from 2018 for which R Beihler served as first author, along with the citation frequency of each:
+
+```{r}
+#| label: illustrate-shortnames
+#refWorks %>% filter("beihler r 2018" %in% shortname)
+```
+
+## Analysis
+
+We now have two collections of literature:
+
+-   coreDSEworks describes the set of scholarly works that
+
+-   refWorks describes the much larger set of scholarly works that are cited by the coreDSEworks
+
+The analysis I present below examines key features of both of these literatures, and the mappings between them, by:
+
+1.  key descriptives
+
+2.  exploring the structure of the reference works
+
+3.  presenting exemplar references from each cluster of the reference works
+
+4.  presenting exemplar core DSE papers drawing from each cluster of the reference works, with attention to
+
+    1.  Popularity
+
+    2.  empirical works
+
+    3.  theoretical/pedagogical works
+
+    4.  standards and frameworks
+
+# Results
+
+Part I
+
+asdfasdf
+
+Part II
+
+asdfasdf
+
+Part III
+
+asdf
+
+asd
+
+# Discussion
+
+# References
