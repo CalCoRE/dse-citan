@@ -1,0 +1,22 @@
+Duplicates
+(In these cases, the WOS records are less complete so we remove those.)
+WOS:000772199500001
+WOS:000783781900001
+WOS:001003410200006
+WOS:000704236600009
+WOS:001035821900001
+
+Corrections
+(Corrections only, article stays in corpus.)
+2-S2.0-85188647526
+
+Retractions (In this case, the retracted article is also removed.)
+2-S2.0-84975873995
+2-S2.0-84995685043
+
+Full Proceedings
+(These are abstracts for full proceedings volumes.)
+2-S2.0-85127440084
+2-S2.0-85064707039
+2-S2.0-85053154615
+2-S2.0-85026758824
