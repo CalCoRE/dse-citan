@@ -4,14 +4,14 @@ getCoreDSEWorks <- function(scopusPath="./data/scopus.csv",
 
   scopus <- convert2df(file = scopusPath, dbsource = 'scopus',
                        format = "csv")
-  print(paste("Scopus record count:",count(scopus)))
+  message("Scopus record count: ",count(scopus))
   
   wos <- convert2df(file = wosPath, dbsource = 'wos',
                     format = "plaintext")
-  print(paste("WoS record count:",count(wos)))
+  message("WoS record count: ",count(wos))
 
   coreDSEworks <- mergeDbSources(scopus, wos)
-  print(paste("After merge:",count(coreDSEworks)))
+  message("Records after merge and dupe removal: ",count(coreDSEworks))
 
   # rm-list.txt identifies:
   # records that are so incomplete that the text cannot be found;
@@ -21,7 +21,9 @@ getCoreDSEWorks <- function(scopusPath="./data/scopus.csv",
   rmlist <- scan(rmList, what="", sep="\n")
 
   coreDSEworks <- coreDSEworks[ ! coreDSEworks$UT %in% rmlist, ]
-  print( paste("Removed",length(rmlist),"records manually using",rmList) )
+  message("Removed ",length(rmlist)," records manually using ",rmList)
+  
+  message("There are currently ", count(coreDSEworks), " records in coreDSEworks.")
   
   return(coreDSEworks)
 }
