@@ -9,7 +9,7 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
   refWorks$CR <- gsub(charExcludeList,'',refWorks$CR)
   
   cleanRefLookup <- as.data.frame(matrix(ncol=4))
-  colnames(cleanRefLookup) <- c("Freq", "CR", "correctedFreq", "correctedCR")
+  colnames(cleanRefLookup) <- c("origFreq", "origCR", "correctedFreq", "correctedCR")
   refWorks$counted <- FALSE
   
   # load up some manual duplications i'd like to fix
