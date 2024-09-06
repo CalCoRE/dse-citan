@@ -61,3 +61,18 @@ coreShortNames <- function(coreDSEworks,cleanRefLookup) {
   }
   return(coreDSEworks)
 }
+
+lookupRefByShortname <- function(shortname) {
+  
+  # remember the shortnames we constructed are last name, first initial.
+  # sometimes refNet's shortnames have last name, first name full.
+  lookupShortname <- tolower(paste0(
+    word(shortname), " ",  # first word (last name)
+    str_sub(word(shortname,2),1,1),     # second word (first initial)
+    str_sub(shortname,3))) # year
+  
+  records <- cleanRefLookup %>% 
+    filter( lookupShortname %in% shortname )
+  
+  return( records )
+}
