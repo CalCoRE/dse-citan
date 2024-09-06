@@ -6,10 +6,12 @@ WOS:001003410200006
 WOS:000704236600009
 WOS:001035821900001
 WOS:000663537400001
+WOS:001297614900010
 
 Corrections
 (Corrections only, article stays in corpus.)
 2-S2.0-85188647526
+2-S2.0-85202468429
 
 Retractions (In this case, the retracted article is also removed.)
 2-S2.0-84975873995
