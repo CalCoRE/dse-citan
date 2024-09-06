@@ -8,3 +8,6 @@ dse_citan_files/*
 dse_citan.html
 data/.DS_Store
 scripts/.DS_Store
+data/jul14refworks.csv
+data/Jul27refworks.csv
+data/Jul29refworks.csv
