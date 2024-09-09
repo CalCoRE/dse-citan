@@ -8,8 +8,8 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
 
   refWorks$CR <- gsub(charExcludeList,'',refWorks$CR)
   
-  cleanRefLookup <- as.data.frame(matrix(ncol=4))
-  colnames(cleanRefLookup) <- c("origFreq", "origCR", "correctedFreq", "correctedCR")
+  cleanRefLookup <- as.data.frame(matrix(ncol=2))
+  colnames(cleanRefLookup) <- c("correctedFreq", "correctedCR")
   refWorks$counted <- FALSE
   
   # load up some manual duplications i'd like to fix
@@ -30,20 +30,25 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€
   for( i in 1:nrow(refWorks) ) {
     
     # get a clean version of the reference text
-    compareTo <- gsub(charExcludeList,'',refWorks$CR[i])
+    compareTo <- refWorks$CR[i]
+    
+    # get the group of manual refs
+    manualRefs <- manual %>% 
+      filter(CR == compareTo)
+    #manualRefs <- manual %>% filter(correctedCR == compareTo)
+    manualGroup <- refWorks %>% 
+      filter(counted==FALSE) %>%
+      filter( CR %in% manualRefs$CR) 
+    
+    print(manualRefs)
     
     # if there is any meat to the entry
     if( str_length(compareTo) > 40) {
       
-      # get the group of manual refs
-      manualRefs <- manual %>% filter(correctedCR == compareTo)
-      manualGroup <- refWorks %>% filter(counted==FALSE) %>%
-        filter(gsub(charExcludeList,'',CR) %in% manualRefs$CR) 
-      
       # get the group of like refs that haven't already been captured manually
       refGroup <- refWorks %>% filter(counted==FALSE) %>%
-        filter( gsub(charExcludeList,'',CR) %like% substr(
-          compareTo,0,str_length(compareTo)*.70) ) %>%
+        filter( CR %like% 
+                  substr(compareTo,0,str_length(compareTo)*.70) ) %>%
         filter( !(gsub(charExcludeList,'',CR) %in% manualRefs$CR) )
       
       refGroup <- rbind(refGroup,manualGroup)
