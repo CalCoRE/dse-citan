@@ -35,15 +35,15 @@ refWorks <- as.data.frame(
 # table that maps all the less common (but matching) reference formats
 # back to whatever the most popular form of the reference is.
 charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.]'
-#cleanRefLookup <- mapCleanRefs(refWorks,charExcludeList)
+refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
 cleanRefLookup <- read.csv("data/Jul30refworks.csv")
 
 # Replace refs list in the core works with cleaned refs
-coreDSEworks <- cleanRefs(coreDSEworks,cleanRefLookup)
+coreDSEworks <- cleanRefs(coreDSEworks)
 
 # create shortnames and add them as a new ref list to coreDSEworks
-cleanRefLookup <- refShortNames(cleanRefLookup)
-coreDSEworks <- coreShortNames(coreDSEworks,cleanRefLookup)
+refWorks <- refShortNames(refWorks)
+coreDSEworks <- coreShortNames(coreDSEworks,refWorks)
 
 
 ###################### PART 1 ##########################
