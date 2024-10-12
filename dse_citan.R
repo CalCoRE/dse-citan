@@ -36,7 +36,8 @@ refWorks <- as.data.frame(
 # back to whatever the most popular form of the reference is.
 charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.]'
 refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
-cleanRefLookup <- read.csv("data/Jul30refworks.csv")
+refWorks <- mapCleanRefs(refWorks)
+#cleanRefLookup <- read.csv("data/Jul30refworks.csv")
 
 # Replace refs list in the core works with cleaned refs
 coreDSEworks <- cleanRefs(coreDSEworks)
@@ -68,12 +69,13 @@ refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
 # Map the network featured in the proposal text.
 # I set a cutoff to include only papers referenced 3 or more times in the
 # network. The clusters, however, are robust to cutoff changes
-cutoff = as.integer(count(refWorks %>% filter(Freq>2)))
-refNet=networkPlot(refMatrix, n = cutoff,
-                   Title = "Co-Citation Network of Top DSE Reference Works",
-                   size.cex=TRUE, size=15, remove.multiple=FALSE,
-                   remove.isolates = TRUE, labelsize=.7, edgesize = 5,
-                   edges.min=0, type = "fruchterman", cluster="louvain")
+cutoff = as.integer(count(refWorks %>% filter(Freq>6)))
+#refNet=networkPlot(refMatrix, n = cutoff,
+#                   Title = "Co-Citation Network of Top DSE Reference Works",
+#                   size.cex=TRUE, size=15, remove.multiple=FALSE,
+#                   remove.isolates = TRUE, labelsize=.7, edgesize = 5,
+#                   edges.min=0, type = "fruchterman")
+refNet=networkPlot(refMatrix)
 # louvain clustering seeks to "cut clusters at their joints"
 
 # to reproduce the visualization featured in the proposal submission,
