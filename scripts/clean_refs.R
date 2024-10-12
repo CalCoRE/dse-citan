@@ -10,7 +10,9 @@ mapCleanRefs <- function(refWorks,charExcludeList="[\\:\\(\\)+\\?\\|\\\"\\â€œ\\â
   
   
   # STEP 1
-  # combine matching refworks after exclusing special characters.
+  # combine matching refworks after excluding special characters.
+  print("Match after removing special characters.")
+
   for( i in 1:nrow(refWorks) ) { # for each refwork
     if( ! refWorks$counted[i] ) { #if not already counted
       compareTo <- refWorks$CR[i] # with this same name
@@ -45,7 +47,9 @@ mapCleanRefs <- function(refWorks,charExcludeList="[\\:\\(\\)+\\?\\|\\\"\\â€œ\\â
   # very large author lists, because these lists are treated differently by 
   # different communities. you can print out the likely dupes during
   # the shortnaming process in dse_citan.R
+  
   manual <- read.csv("./data/manualdupes.txt", sep=",")
+  print(paste("Removing",count(manual),"manually identified matches."))
   for( i in 1:nrow(refWorks) ) {
     compareTo <- refWorks$CR[i]
     
@@ -76,8 +80,11 @@ mapCleanRefs <- function(refWorks,charExcludeList="[\\:\\(\\)+\\?\\|\\\"\\â€œ\\â
   pb = txtProgressBar(min = 0, max = nrow(refWorks), initial = 0, style = 3)
   
   # for each item that hasn't yet been counted
+  print("Removing close fuzzy text matches.")
   for( i in 1:nrow(refWorks) ) {
 
+    setTxtProgressBar(pb,i)
+    
     # get a clean version of the reference text
     compareTo <- refWorks$CR[i]
     
@@ -122,8 +129,8 @@ mapCleanRefs <- function(refWorks,charExcludeList="[\\:\\(\\)+\\?\\|\\\"\\â€œ\\â
         #### END FIX
       }
     }
-    setTxtProgressBar(pb,i)
   }
+  
   
   
   # manual disaggregation of GAISE II vs GAISE COLLEGE
@@ -136,6 +143,8 @@ mapCleanRefs <- function(refWorks,charExcludeList="[\\:\\(\\)+\\?\\|\\\"\\â€œ\\â
   
   #finally, put the correctedCR to all the actual correct CRs for easy lookup
   refWorks[refWorks$correctedCR=="",]$correctedCR <- refWorks[refWorks$correctedCR=="",]$CR
+
+  return(refWorks)  
 }
 
 cleanRefs <- function(coreDSEworks) {
