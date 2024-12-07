@@ -1,4 +1,4 @@
-mapCleanRefs <- function(refWorks,charExcludeList="[\\:\\(\\)+\\?\\|\\\"\\“\\”\\,'\\`\\‘\\.]") {
+mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]') {
   print("Be patient. Maybe go grab a coffee.")
   
   # manual fix this one record resulting from a wayward semicolon

@@ -7,12 +7,12 @@
 
 setwd("~/Documents/GitHub/dse-citan")
 
-library(agop)
-library(dplyr)
-library(stringr)
-library(textTools)
+#library(agop)
+library(dplyr) 
+library(stringr) # for cleaning and matching duplicate references
+library(textTools) # for matching duplicate references
 library(bibliometrix)
-library(visNetwork)
+#library(visNetwork)
 
 # this script expects the working directory to be this source file's location
 source("scripts/read_works.R")
@@ -25,6 +25,7 @@ source("scripts/shortnames.R")
 # Remove corrections, retractions, notes. Keep early access records.
 
 coreDSEworks <- getCoreDSEWorks()
+coreDSEworks$CR <- coreDSEworks$CR_raw
 
 # get a data frame of the references.
 refWorks <- as.data.frame(
@@ -34,7 +35,7 @@ refWorks <- as.data.frame(
 # to be incorrectly counted and mapped. Below I'm making a lookup
 # table that maps all the less common (but matching) reference formats
 # back to whatever the most popular form of the reference is.
-charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.]'
+charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]'
 refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
 refWorks <- mapCleanRefs(refWorks)
 #cleanRefLookup <- read.csv("data/Jul30refworks.csv")
@@ -69,13 +70,12 @@ refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
 # Map the network featured in the proposal text.
 # I set a cutoff to include only papers referenced 3 or more times in the
 # network. The clusters, however, are robust to cutoff changes
-cutoff = as.integer(count(refWorks %>% filter(Freq>6)))
-#refNet=networkPlot(refMatrix, n = cutoff,
-#                   Title = "Co-Citation Network of Top DSE Reference Works",
-#                   size.cex=TRUE, size=15, remove.multiple=FALSE,
-#                   remove.isolates = TRUE, labelsize=.7, edgesize = 5,
-#                   edges.min=0, type = "fruchterman")
-refNet=networkPlot(refMatrix)
+cutoff = as.integer(count(refWorks %>% filter(Freq>2)))
+refNet=networkPlot(refMatrix, n = cutoff,
+                   Title = "Co-Citation Network of Top DSE Reference Works",
+                   size.cex=TRUE, size=15, remove.multiple=FALSE,
+                   remove.isolates = TRUE, labelsize=.7, edgesize = 5,
+                   edges.min=0, type = "fruchterman", cluster = "louvain")
 # louvain clustering seeks to "cut clusters at their joints"
 
 # to reproduce the visualization featured in the proposal submission,
@@ -101,7 +101,7 @@ refBrokers %>% head(10)
 # Let's join to the rest of their ref records
 
 brokersLookup <- unlist(paste0(refBrokers$vertex))
-brokers <- cleanRefLookup %>%
+brokers <- refWorks %>%
   filter( correctedFreq > 0 ) %>% 
   filter( !is.na( shortname ) ) %>% 
   filter( shortname %in% refBrokers$vertex )
@@ -128,7 +128,7 @@ referenceClusterAuthors <- refNet[["cluster_res"]] %>%
 
 getClusterHub <- function(i) {
   clusterLookup <- referenceClusterAuthors$authors[[i]]
-  return( cleanRefLookup %>%
+  return( refWorks %>%
     filter( correctedFreq > 0 ) %>% 
     filter( !is.na( shortname ) ) %>% 
     filter( shortname %in% clusterLookup ) %>%

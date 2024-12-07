@@ -32,7 +32,7 @@ refShortNames <- function(refWorks) {
       for( index in indices ) {
         # if there are more than three records, let us know the name to check
         # for dupes
-        if(append > 3) {
+        if(append > 2) {
           print(refWorks[index,]$shortname)
         }
         refWorks[index,]$shortname <- paste0(
