@@ -30,9 +30,9 @@ refShortNames <- function(refWorks) {
           refWorks$correctedFreq > 0, arr.ind = TRUE)
       append = 1
       for( index in indices ) {
-        # if there are more than three records, let us know the name to check
+        # if there are more than two records, let us know the name to check
         # for dupes
-        if(append > 2) {
+        if(append > 1) {
           print(refWorks[index,]$shortname)
         }
         refWorks[index,]$shortname <- paste0(

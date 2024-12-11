@@ -35,7 +35,7 @@ refWorks <- as.data.frame(
 # to be incorrectly counted and mapped. Below I'm making a lookup
 # table that maps all the less common (but matching) reference formats
 # back to whatever the most popular form of the reference is.
-charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]'
+charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*\\’]'
 refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
 refWorks <- mapCleanRefs(refWorks)
 #cleanRefLookup <- read.csv("data/Jul30refworks.csv")
