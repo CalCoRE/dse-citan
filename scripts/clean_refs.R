@@ -1,4 +1,4 @@
-mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]') {
+mapCleanRefs <- function(refWorks) {
   print("Be patient. Maybe go grab a coffee.")
   
   # manual fix this one record resulting from a wayward semicolon
@@ -6,73 +6,111 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\“\\�
   # this part of the reference is reintroduced to its parent via manualdupes
   refWorks <- refWorks %>% 
     filter(CR != "JOURNAL OF STATISTICS EDUCATION 27 3 PP 265-274")
-  refWorks$counted <- FALSE
-  
   
   # STEP 1
   # combine matching refworks after excluding special characters.
-  print("Match after removing special characters.")
+  refWorks <- cleanSpecialChars(refWorks)
 
-  for( i in 1:nrow(refWorks) ) { # for each refwork
-    if( ! refWorks$counted[i] ) { #if not already counted
-      compareTo <- refWorks$CR[i] # with this same name
-      dupes <- refWorks[refWorks$CR==compareTo,] # here they are
+  # STEP 2
+  # load up some manual duplication referenceID'd like to fix
+  # if you are updating this analysis, the biggest offender are references with
+  # very large author lists, because these lists are treated differently by 
+  # different communities. you can print out the likely matchGroup during
+  # the shortnaming process in dse_citan.R
+  refWorks <- cleanManualDuplicates(refWorks,"./data/manualdupes.txt")
+  
+  # PART 3
+  refWorks <- fuzzyMatch(refWorks,.80)
+  
+  # manual disaggregation of GAISE II vs GAISE COLLEGE
+  #refWorks[refWorks$CR=="BARGAGLIOTTI A FRANKLIN C ARNOLD P GOULD R JOHNSON S PEREZ L SPANGLER DA PRE-K-12 GUIDELINES FOR ASSESSMENT AND INSTRUCTION IN STATISTICS EDUCATION II GAISE II 2020",]$correctedCR <- ""
+  #refWorks[refWorks$CR=="DATA SCIENCE FOR UNDERGRADUATES OPPORTUNITIES AND OPTIONS 2018",]$correctedFreq <-
+  #  refWorks[refWorks$CR=="DATA SCIENCE FOR UNDERGRADUATES OPPORTUNITIES AND OPTIONS 2018",]$correctedFreq -
+  #  refWorks[refWorks$CR=="BARGAGLIOTTI A FRANKLIN C ARNOLD P GOULD R JOHNSON S PEREZ L SPANGLER DA PRE-K-12 GUIDELINES FOR ASSESSMENT AND INSTRUCTION IN STATISTICS EDUCATION II GAISE II 2020",]$Freq
+
+
+  return(refWorks)  
+}
+
+cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]') {
+  count <- nrow(refWorks)
+  
+  refWorks$counted <- FALSE
+  
+  for( referenceID in 1:nrow(refWorks) ) { # for each refwork
+    if( ! refWorks$counted[referenceID] ) { #if not already counted
+      compareTo <- refWorks$CR[referenceID] # use this name to compare others
+      matchGroup <- refWorks[refWorks$CR==compareTo,] # copy the matches
       
-      if( nrow( dupes ) > 1 ) { # if more than one
+      if( nrow( matchGroup ) > 1 ) { # if more than one match
         
-        # first set all the dupes to 0 frequency and counted = true
+        # first set all the matching refWorks to 0 frequency and counted = true
         refWorks[refWorks$CR==compareTo,]$Freq <- 0
         refWorks[refWorks$CR==compareTo,]$counted <- TRUE
         
-        #except set my parent back to the sum of freqencies and still subject
-        #to further aggregation in subsequent steps
-        refWorks$Freq[i] <- sum( dupes$Freq )
-        refWorks$counted[i] <- FALSE
+        # except set my parent back to the sum of frequencies in matchGroup
+        # and set the parent as uncounted; still subject
+        # to further aggregation in subsequent steps
+        refWorks$Freq[referenceID] <- sum( matchGroup$Freq )
+        refWorks$counted[referenceID] <- FALSE
       }
     }
   }
-  refWorks <- refWorks[!refWorks$counted,] # just keep the aggregated refs
+  refWorksMatchesRemoved <- refWorks[!refWorks$counted,]
   
-  #### A TEST for the above - do the sums match? 10/8 yes
+  print(paste("Removed",
+              count-nrow(refWorksMatchesRemoved),
+              "duplicate records with special characters."))
   
-  
-  # now, we turn refWorks into a lookup table. 
-  refWorks$correctedFreq <- 0
-  refWorks$correctedCR <- ""
-  
+  return(refWorksMatchesRemoved) # drop the refs that were duplicates
+}
 
-  
-  # load up some manual duplications i'd like to fix
-  # if you are updating this analysis, the biggest offender are references with
-  # very large author lists, because these lists are treated differently by 
-  # different communities. you can print out the likely dupes during
-  # the shortnaming process in dse_citan.R
-  
+cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
   manual <- read.csv("./data/manualdupes.txt", sep=",")
-  print(paste("Removing",count(manual),"manually identified matches."))
-  for( i in 1:nrow(refWorks) ) {
-    compareTo <- refWorks$CR[i]
+  count <- 0
+  
+  # for each item in refWorks
+  for( referenceID in 1:nrow(refWorks) ) {
+    compareTo <- refWorks$CR[referenceID]
     
-    # point the bad refs to the corrected ref 
+    # if this reference is one of the ones that needs to be manually corrected
     if( compareTo %in% manual$CR ) {
-      refWorks$correctedCR[i] <- manual$correctedCR[manual$CR==compareTo]
+      # then set the correctedCR for this ref to the manual correction
+      refWorks$correctedCR[referenceID] <- 
+        manual$correctedCR[manual$CR==compareTo]
+      count <- count + 1
     }
   }
   
-  # after all the pointers are done, tally up the sums
-  for( i in 1:nrow(refWorks) ) {
-    compareTo <- refWorks$CR[i]
+  print(paste("Mapped",count,"manual duplicate records to parents"))
+  
+  # after all the item corrections are done, tally up the sums
+  for( referenceID in 1:nrow(refWorks) ) {
+    compareTo <- refWorks$CR[referenceID]
     
-    # if this one is a correct one
+    # if this one is the parent to any corrected refs
     if( compareTo %in% refWorks$correctedCR ) {
-      # aggregate all freq to this ref
-      refWorks$correctedFreq[i] <- refWorks$Freq[i] + sum( refWorks[refWorks$correctedCR==compareTo,]$Freq )
+      # aggregate the child frequencies to the parent
+      refWorks$correctedFreq[referenceID] <- 
+        refWorks$Freq[referenceID] + 
+        sum( refWorks[refWorks$correctedCR==compareTo,]$Freq )
+      # call this one counted
       refWorks[refWorks$correctedCR==compareTo,]$counted <- TRUE
-    }
+      refWorks[refWorks$correctedCR==compareTo,]$correctedFreq <- 0
+    } 
   }
   
+  print(paste("We now have",
+              nrow(refWorks %>% filter(correctedFreq > 0)),
+              "parent refs."))
   
-  # I'm matching on the first 70% of the ref. if there are multiple versions
+  return(refWorks)
+}
+
+fuzzyMatch <- function(refWorks,threshold=.80) {
+  count <- 0
+  
+  # referenceID'm matching on the first 70% of the ref. if there are multiple versions
   # of something like a textbook, this would aggregate them. It looks at the
   # first part since the last part is most likely where reasonable differences
   # emerge - journal abbreviations, different levels of detail (doi,
@@ -80,88 +118,95 @@ mapCleanRefs <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\“\\�
   pb = txtProgressBar(min = 0, max = nrow(refWorks), initial = 0, style = 3)
   
   # for each item that hasn't yet been counted
-  print("Removing close fuzzy text matches.")
-  for( i in 1:nrow(refWorks) ) {
-
-    setTxtProgressBar(pb,i)
+  for( referenceID in 1:nrow(refWorks) ) {
+    
+    setTxtProgressBar(pb,referenceID)
     
     # get a clean version of the reference text
-    compareTo <- refWorks$CR[i]
+    compareTo <- refWorks$CR[referenceID]
     
     # if there is any meat to the entry
     if( str_length(compareTo) > 40 ) {
       
       # make a group from the refs 
-      refGroup <- refWorks %>% 
+      matchGroup <- refWorks %>% 
         filter( !counted ) %>% #that haven't already been captured manually
-        filter( CR %like% substr(compareTo,0,str_length(compareTo)*.70) ) # and match the start
+        filter( CR %like% substr(compareTo,0,str_length(compareTo)*threshold) ) # and match the start
       
       # if we find this group has any entries, let's consolidate them
       # all our refWorks are distinct strings, so we can just use that to
-      # select what we want from refGroup and apply it to refWorks
-      if( nrow(refGroup) > 1 ) {
+      # select what we want from matchGroup and apply it to refWorks
+      if( nrow(matchGroup) > 1 ) {
         
         # make the most cited entry the parent. look first at corrected Freq 
         # then uncorrected freq. if there are ties, just whatever gets sorted 
         # to the top wins.
-        correctCR <- (refGroup %>% 
+        correctCR <- (matchGroup %>% 
                         arrange(desc(correctedFreq),desc(Freq)))[1,]$CR
         
         # pull the parent out of the reference group
-        refGroup <- refGroup[refGroup$CR!=correctCR,]
+        matchGroup <- matchGroup[matchGroup$CR!=correctCR,]
         
-        for( i in 1:nrow(refGroup)) {
-          refWorks[refWorks$CR==refGroup$CR[i],]$counted <- TRUE
-          refWorks[refWorks$CR==refGroup$CR[i],]$correctedCR <- correctCR
-        }
+        # call the parent counted
+        refWorks[refWorks$CR==correctCR,]$counted <- TRUE
         
+        # and keep count of all child matches
+        count <- count + nrow(matchGroup)
         
-        ### FIX, add the max of Freq or correctedFreq. Probably just a loop.
+        # add the sum of childrens' Freq to the parent
         if( refWorks[refWorks$CR == correctCR,]$correctedFreq > 0 ) {
-          #if there's a corrected frequency add that to the others
+          #if there's a corrected parent frequency add that to the others
           refWorks[refWorks$CR == correctCR,]$correctedFreq <-
             refWorks[refWorks$CR == correctCR,]$correctedFreq +
-            sum(refGroup$Freq)
+            sum(matchGroup$Freq)
         } else { # just add all the frequencies
           refWorks[refWorks$CR == correctCR,]$correctedFreq <- 
-            sum(refGroup$Freq) + refWorks[refWorks$CR == correctCR,]$Freq
+            refWorks[refWorks$CR == correctCR,]$Freq +
+            sum(matchGroup$Freq)
         }
-        #### END FIX
+        
+        #### FOR ALL IN THE MATCH GROUP
+        ### UPDATE THE CRS
+        ### UPDATE THE FREQ
+        for( i in 1:nrow(matchGroup) ) {
+          
+          matchCR <- matchGroup$CR[i]
+          #print(matchCR)
+          refWorks[refWorks$CR==matchCR,]$correctedCR <- correctCR
+          refWorks[refWorks$CR==matchCR,]$correctedFreq <- 0
+        }
       }
-    }
+    } 
   }
+  print(paste("Found",count,"additional matches using fuzzy text."))
+  print(paste("We now have",
+              nrow(refWorks %>% filter(correctedFreq > 0)),
+              "parent refs."))
   
+  # finally, if a ref doesn't have a correctedCR then its existing CR
+  # is the correct CR... copy that over.
+  refWorks[refWorks$correctedCR == "",]$correctedCR <- 
+    refWorks[refWorks$correctedCR == "",]$CR
   
-  
-  # manual disaggregation of GAISE II vs GAISE COLLEGE
-  refWorks[refWorks$CR=="BARGAGLIOTTI A FRANKLIN C ARNOLD P GOULD R JOHNSON S PEREZ L SPANGLER DA PRE-K-12 GUIDELINES FOR ASSESSMENT AND INSTRUCTION IN STATISTICS EDUCATION II GAISE II 2020",]$correctedCR <- ""
-  refWorks[refWorks$CR=="DATA SCIENCE FOR UNDERGRADUATES OPPORTUNITIES AND OPTIONS 2018",]$correctedFreq <-
-  refWorks[refWorks$CR=="DATA SCIENCE FOR UNDERGRADUATES OPPORTUNITIES AND OPTIONS 2018",]$correctedFreq -
-  refWorks[refWorks$CR=="BARGAGLIOTTI A FRANKLIN C ARNOLD P GOULD R JOHNSON S PEREZ L SPANGLER DA PRE-K-12 GUIDELINES FOR ASSESSMENT AND INSTRUCTION IN STATISTICS EDUCATION II GAISE II 2020",]$Freq
-
-  
-  
-  #finally, put the correctedCR to all the actual correct CRs for easy lookup
-  refWorks[refWorks$correctedCR=="",]$correctedCR <- refWorks[refWorks$correctedCR=="",]$CR
-
-  return(refWorks)  
+  return( refWorks )
 }
 
-cleanRefs <- function(coreDSEworks) {
+rewriteCleanRefs <- function(coreDSEworks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]') {
   # the moment of truth: the less common duplicates of references in the
   # actual reference list of coreDSEworks are replaced with the
   # most common form: so citations are aggregated, linked, and mapped properly.
-  for( i in 1:nrow(coreDSEworks) ) {
+  for( coreWorkID in 1:nrow(coreDSEworks) ) {
     # pull apart the refList for this core work into a dataframe
-    thisRefsList <- as.data.frame(str_split(coreDSEworks$CR[i],"; "))
+    thisRefsList <- as.data.frame(str_split(coreDSEworks$CR_raw[coreWorkID],";"))
     colnames(thisRefsList) <- c("ref")
     thisRefsList$ref <- gsub(charExcludeList,'',thisRefsList$ref)
     
     # use cleanRefs lookup to replace duplicate records with main
     thisRefsList[] <- refWorks$correctedCR[match(unlist(thisRefsList), refWorks$CR)]
+    coreDSEworks$debugmode[coreWorkID] <- thisRefsList
     
     # stitch it all back together and put it back in the core work
-    coreDSEworks$CR[i] <- paste(thisRefsList$ref,collapse="; ")
+    coreDSEworks$CR[coreWorkID] <- paste(thisRefsList$ref,collapse="; ")
   }
   return( coreDSEworks )
 }

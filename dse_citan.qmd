@@ -108,9 +108,9 @@ Of the publication records that are included in the coreDSEworks corpus, 7 recor
 
 Both Scopus and the Clairviate/Web of Science databases include the full reference lists of each record. Using the `bibliometrix citations()` function, we can construct a new dataset `refWorks` to represent the full set of foundational works from which the "data science education" literature represented by `coreDSEworks` draws.
 
-The reference lists included in Scopus and WoS databases are text-only, and the reference formats that are used across the disciplines engaged in data science education (e.g. ACM, APA, IEEE) are quite different. Therefore, the process of cleaning the refWorks list to ensure that references are matched and properly counted and linked is not trivial. Tab 1 of [Fig 2](#tabset-2-1-tab) displays the first 100 records in the `refWorks` dataframe, ordered by frequency of citations. However, several other citations of many of these paper exist as separate records in the dataframe. Consider, for example, the multiple records representing the National Academies' [-@medicine2018] report *Data Science for Undergraduates: Opportunities and Options* on Tab 2. Using automated and manual methods, I constructed a lookup table to map each record indicating a given duplicated reference to what was initially the most popular cited format, and aggregate the citation count across all records to that same most popular cited record.
+The reference lists included in Scopus and WoS databases are text-only, and the reference formats that are used across the disciplines engaged in data science education (e.g. ACM, APA, IEEE) are quite different. Therefore, the process of cleaning the refWorks list to ensure that references are matched and properly counted and linked is not trivial. Tab 1 of [Fig 2](#tabset-2-1-tab) displays the first 100 records in the `refWorks` dataframe, ordered by frequency of citations. However, several other citations of many of these paper exist as separate records in the dataframe. Consider, for example, the multiple records representing the National Academies' [-@medicine2018] report *Data Science for Undergraduates: Opportunities and Options*. (Additional references to this report exist with abbreviations such as "DATA SCI UND OPP OPT," which are addressed manually.) Using automated and manual methods, I constructed a lookup table to map each record indicating a given duplicated reference to what was initially the most popular cited format, and aggregate the citation count across all records to that same most popular cited record.
 
-After consolidating citation counts across duplicate records, the relative positions of different cited reference works changes quite a bit. Tab 3 of Fig 2 features the top 100 records in the lookup table with corrected citation counts, again ordered by frequency of citations. The differences between the original refWorks table and the corrected table demonstrate the importance of such records consolidation; the [-@medicine2018] *Data Science for Undergraduates* reference that was originally listed as the most freqently referenced citation is superseded by DeVeaux et al's [-@deveaux2017] curriculum guidelines. Similarly, several other works in the original top 10 list change position or are even replaced by others.
+After consolidating citation counts across duplicate records, the relative positions of different cited reference works changes quite a bit. Tab 3 of Fig 2 features the top 100 records in the lookup table with corrected citation counts, again ordered by frequency of citations. The differences between the original refWorks table and the corrected table demonstrate the importance of such records consolidation; the [-@medicine2018] *Data Science for Undergraduates* reference that was originally listed as the most frequently referenced citation is superseded by DeVeaux et al's [-@deveaux2017] curriculum guidelines. Similarly, several other works in the original top 10 list change position or are even replaced by others.
 
 ```{r}
 #| label: extract-reference-works
@@ -133,7 +133,15 @@ datatable(showabit)
 source("scripts/clean_refs.R")
 charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*\\’]'
 refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
-refWorks <- mapCleanRefs(refWorks)
+
+refWorks$correctedCR <- ""
+refWorks$correctedFreq <- refWorks$Freq
+
+refWorks <- cleanSpecialChars(refWorks)
+refWorks <- cleanManualDuplicates(refWorks)
+refWorks <- fuzzyMatch(refWorks,.75)
+
+datatable(refWorks)
 ```
 
 ```{r}
@@ -141,14 +149,16 @@ refWorks <- mapCleanRefs(refWorks)
 
 # give a sneak peek
 showabit <- refWorks %>% arrange(desc(correctedFreq))
-datatable(showabit[c(1,2,4)])
+datatable(showabit[c(1,5,2,4,3)])
 ```
 
-The lookup table is used to replace all duplicate versions of a given reference that appear in the original coreDSEworks dataframe with the corrected version. This ensures that when the reference citation analysis is applied to the coreDSEworks, all versions of citations that correspond to a given reference are appropriately consolidated in the construction of the reference network and associated node measures.
+Finally, the lookup table is used to replace all duplicate versions of a given reference that appear in the original coreDSEworks dataframe with the corrected version. This ensures that when the reference citation analysis is applied to the coreDSEworks, all versions of citations that correspond to a given reference are appropriately consolidated in the construction of the reference network and associated node measures.
 
 ```{r}
-# Replace refs lists in the core works with cleaned refs
-coreDSEworks <- cleanRefs(coreDSEworks)
+# Replace refs lists in the core works datatable with cleaned refs
+coreDSEworks <- rewriteCleanRefs(coreDSEworks,charExcludeList)
+
+datatable(coreDSEworks[c(27,91,93)])
 ```
 
 #### Indexing Between Core and Reference Works
@@ -162,6 +172,7 @@ source("scripts/shortnames.R")
 # create shortnames and add them as a new ref list to coreDSEworks
 refWorks <- refShortNames(refWorks)
 coreDSEworks <- coreShortNames(coreDSEworks,refWorks)
+datatable(refWorks)
 ```
 
 In cases where more than one reference exists from the same first author in the same year, shortnames are appended with a number, by descending citation frequency. This, too, replicates shortnames as they appear in the `refNetwork`. For example, below are shortnames for multiple distinct reference works in 2018, for which R Biehler served as first author:
@@ -170,9 +181,7 @@ In cases where more than one reference exists from the same first author in the 
 #| label: illustrate-shortnames
 
 datatable(refWorks[c(1,4,6)] %>% 
-            filter(shortname %like% "sangsawang t 2006") %>% 
-            filter(correctedFreq > 0) %>%
-            arrange(desc(correctedFreq)))
+            filter(shortname %like% "sangsawang t 2006"))
 ```
 
 ## Analysis
@@ -207,6 +216,7 @@ Tab 2 lists the top 5 publication venues for these works. These venues mirror th
 #| label: plot-timeline
 coreBibAnalysis <- biblioAnalysis(data.frame(coreDSEworks))
 hist(coreBibAnalysis$Years)
+summary(coreBibAnalysis$Sources, max=10)
 ```
 
 ## The Reference Co-Citation Network
@@ -220,25 +230,16 @@ Finally, I use the `biblioNetwork` function within the R `bibliometrix` package.
 # build co-citation network of DSE cited works
 refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
                            network = "references", sep = "; ")
+```
 
-# Map the network featured in the proposal text.
-# I set a cutoff to include only papers referenced 4 or more times in the
+Fig 3 features a visualization of the reference co-citation network of all papers that are cited at by at least 3 distinct core DSE works. In both representations, three distinct clusters can be identified: a green cluster to the left of both \[XXX\]
+
+```{r}
+#| label: visualize-ref-net
+
+# I set a cutoff to include only papers referenced 3 or more times in the
 # network. The clusters, however, are robust to cutoff changes
 cutoff = as.integer(count(refWorks %>% filter(Freq>2)))
-```
-
-[Fig 3](#refnet) features a visualization of the reference co-citation network of all papers that are cited at by at least 3 distinct core DSE works. In both representations, three distinct clusters can be identified: a green cluster to the left of both \[XXX\]
-
-```{r}
-#| label: pretty-ref-net
-# To regenerate the visualization shared here, use VOSviewer to
-# visualize refNet as it is generated in the preceding code.
-# Set attraction = 3; repulsion = 0
-```
-
-![Reference Network visualization generated by VOSviewer. Three distinct communities are evident in the network.](dse_citan_files/jul30refvos.png){#refnet}
-
-```{r}
 refNet=networkPlot(refMatrix, n = cutoff,
                    Title = "Co-Citation Network of Top DSE Reference Works",
                    size.cex=TRUE, size=15, remove.multiple=FALSE,
@@ -247,7 +248,7 @@ refNet=networkPlot(refMatrix, n = cutoff,
 # louvain clustering seeks to "cut clusters at their joints"
 ```
 
-While these two visualization formats are intended to highlight different features of the network structure, both identify the same three main clusters. Consistent with research on bibliometric citation network analysis (e.g. XXX), I conceptualize of these three clusters as representing distinct intellectual communities that together form the foundations of the Data Science Education literature.
+While these two visualization formats are intended to highlight different features of the network structure, both identify the same three main clusters. Consistent with research on bibliometric citation network analysis (e.g. XXX), I conceptualize of these three clusters as representing distinct intellectual communities that together form the foundations of the Data Science Education literature. The remainder of this paper examines the nature of these communities and the similarities and differences among them.
 
 ## Structural Foundations of Data Science Education
 
@@ -257,34 +258,38 @@ In the remainder of the results section, I first present an analysis of the stru
 
 In network science, a *broker* describes a node in a network that connects otherwise distinct communities. These nodes are characterized by high betweenness centrality measures. When applied to bibliographic networks, broker works reflect papers that are referenced alongside papers that belong to otherwise distinct reference clusters. This can signal higher visibility or relevance of these works across scholarly communities.
 
-To identify the most highly cited reference works in this network, I first identify all nodes with a betweenness centrality of over 150. This is quite high; the mean betweenness centrality of the network is \~80 and the median is \~7.5. I then sort these nodes in descending order by corrected citation frequency. The sorted list of all broker works is featured in Fig X.
+To identify the most highly cited reference works in this network, I first identify all nodes with a betweenness centrality of over 200. This is quite high; the mean betweenness centrality of the network is \~45 and the median is \~1.6. I then sort these nodes in descending order by corrected citation frequency. The sorted list of all broker works is featured in Fig X.
 
 ```{r}
-#| label: pull-brokers
+#| label: pull-top-ten-brokers
 
+print("The mean betweenness centrality of reference works is:")
 mean(refNet[["cluster_res"]]$btw_centrality)
+print("The median betweenness centrality of reference works is:")
 median(refNet[["cluster_res"]]$btw_centrality)
 
+# select the top 10 most "between" reference works
 refBrokers <- refNet[["cluster_res"]] %>% 
-  filter( btw_centrality >= 200 ) %>% 
-  arrange(desc(btw_centrality))
+  arrange(desc(btw_centrality)) %>%
+  head(10)
+
+# use shortnames to identify the full citation for each
+# reference broker work from the refWorks data frame
+refBrokers$vertex <- paste0(
+  word(refBrokers$vertex,1), " ",
+  str_sub(word(refBrokers$vertex,2),1,1), " ",
+  word(refBrokers$vertex,3))
+
+refBrokers$vertex
+
+relevantRefs <- refWorks %>% 
+  filter(shortname %in% refBrokers$vertex) %>% 
+  filter(correctedFreq > 1) %>% 
+  arrange(desc(correctedFreq))
+
 datatable(refBrokers)
 
-#refBrokers$vertex <- paste0(
-#  word(refBrokers$vertex,1), " ",
-#  str_sub(word(refBrokers$vertex,2),1,1), " ",
-#  word(refBrokers$vertex,3))
-
-#refBrokers$vertex
-
-#relevantRefs <- cleanRefLookup %>% 
-#  filter(shortname %in% refBrokers$vertex) %>% 
-#  filter(correctedFreq > 1) %>% 
-#  arrange(desc(correctedFreq))
-
-#datatable(relevantRefs)
-
-#datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") ) )
+datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(1,3,9,10)] )
 ```
 
 As is evident in the table, the most frequently cited "broker" reference works are [@deveaux2017],[@medicine2018],[@cleveland2001]
@@ -294,33 +299,35 @@ As is evident in the table, the most frequently cited "broker" reference works a
 While broker works establish what different scholarly communities cite in common, identifying "hub" works that are only cited frequently alongside papers in each cluster can help highlight what distinguishes one scholarly community from another. Here, we identify works within each of the three distinct clusters
 
 ```{r}
-#referenceClusterAuthors <- refNet[["cluster_res"]] %>%
+referenceClusterAuthors <- refNet[["cluster_res"]] %>%
   # restrict this to only authors of papers that are not very connected
   # outside of their specific cluster
-#  filter( btw_centrality < 50 ) %>%
-#  group_by(cluster) %>%
-#  summarize(authors = list(
-#    paste(
-#      word(vertex,1),  # first word (last name)
-#      str_sub(word(vertex,2),1,1),     # second word (first initial)
-#      word(vertex,3) )
-#    )
-#  )
+  filter( btw_centrality < mean(refNet[["cluster_res"]]$btw_centrality) ) %>%
+  group_by(cluster) %>%
+  summarize(authors = list(
+    paste(
+      word(vertex,1),  # first word (last name)
+      str_sub(word(vertex,2),1,1),     # second word (first initial)
+      word(vertex,3) )
+    )
+  )
+
+referenceClusterAuthors
 
 #getClusterHub <- function(i) {
 #  clusterLookup <- referenceClusterAuthors$authors[[i]]
-#  return( cleanRefLookup %>%
+#  return( refWorks %>%
 #    filter( correctedFreq > 0 ) %>% 
 #    filter( !is.na( shortname ) ) %>% 
 #    filter( shortname %in% clusterLookup ) %>%
 #    arrange( desc(correctedFreq) ) )
 #}
 
-#for( i in 1:nrow(distinct(refNet[["cluster_res"]], cluster)) ) {
-#  print(paste("Cluster", i, "Popular, insulated members") )
-#  hubs <- getClusterHub(i) 
-#  print( hubs %>% head(5) %>% select(correctedFreq, correctedCR) )
-#}
+#getClusterHub(1)
+
+#getClusterHub(2)
+
+#getClusterHub(3)
 ```
 
 ## Intellectual Foundations of Data Science Education

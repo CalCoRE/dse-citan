@@ -6,25 +6,31 @@ refShortNames <- function(refWorks) {
   # i also catch lingering duplicate records for the more influential works
   # shaping the field, which i add to the manual cleaning file over time.
   # note only first initial
+  
+  # make a shortname "last first yyyy"
   shortname <- tolower(paste0(
-    word(refWorks$correctedCR), " ",  # first word (last name)
-    str_sub(word(refWorks$correctedCR,2),1,1),     # second word (first initial)
-    str_sub(refWorks$correctedCR,-5,-1))) # year
+    word(refWorks$correctedCR), # first word (last name)
+    " ",  
+    word(refWorks$correctedCR,2), #second word (first initial)
+    " ",
+    str_extract(refWorks$correctedCR,regex("\\b(19|20)\\d{2}\\b")) #year
+  ))
+  # get commas out
   refWorks$shortname <- gsub(',','',shortname)
   
-  # for each distinct shortname - holding off for now, but may be needed to
-  # link mutiple author-year refs
+  # pull each distinct shortname
   parentRefShortnames <- as.data.frame(refWorks %>% distinct(shortname))
   
-  # note this is a great place to identify lingering duplicates, check
-  # especially for excessive repeats
+  # for each distinct shortname
   for( i in 1:nrow(parentRefShortnames) ) {
     # get all nonzero-after-correction records with this shortname
     records <- refWorks %>%
-      filter(shortname %in% parentRefShortnames$shortname[i] ) %>%
-      filter(correctedFreq > 0)
+      filter(correctedFreq > 0) %>%
+      filter(shortname %in% parentRefShortnames$shortname[i] )
+    
     # if there's more than one record, append numbers to identify each
-    if( count( records ) > 1 ) {
+    # the most popular is appended -1
+    if( count( records ) > 5 ) {
       indices <- which(
         refWorks$shortname == parentRefShortnames$shortname[i] &
           refWorks$correctedFreq > 0, arr.ind = TRUE)
@@ -32,11 +38,9 @@ refShortNames <- function(refWorks) {
       for( index in indices ) {
         # if there are more than two records, let us know the name to check
         # for dupes
-        if(append > 1) {
-          print(refWorks[index,]$shortname)
-        }
         refWorks[index,]$shortname <- paste0(
           refWorks$shortname[index] , "-", append )
+
         append <- append + 1
       }
     }
@@ -68,7 +72,7 @@ lookupRefByShortname <- function(shortname) {
   # sometimes refNet's shortnames have last name, first name full.
   lookupShortname <- tolower(paste0(
     word(shortname), " ",  # first word (last name)
-    str_sub(word(shortname,2),1,1),     # second word (first initial)
+    word(shortname,2),     # second word (first initial)
     str_sub(shortname,3))) # year
   
   records <- cleanRefLookup %>% 
