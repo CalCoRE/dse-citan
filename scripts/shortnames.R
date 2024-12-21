@@ -42,6 +42,8 @@ refShortNames <- function(refWorks) {
           refWorks$shortname[index] , "-", append )
 
         append <- append + 1
+        
+        if( refWorks[index,]$correctedFreq > 2 ) {print(refWorks[index,]$shortname)}
       }
     }
   }
