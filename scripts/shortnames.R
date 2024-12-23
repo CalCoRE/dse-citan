@@ -30,7 +30,7 @@ refShortNames <- function(refWorks) {
     
     # if there's more than one record, append numbers to identify each
     # the most popular is appended -1
-    if( count( records ) > 5 ) {
+    if( count( records ) > 4 ) {
       indices <- which(
         refWorks$shortname == parentRefShortnames$shortname[i] &
           refWorks$correctedFreq > 0, arr.ind = TRUE)
