@@ -136,10 +136,13 @@ refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
 
 refWorks$correctedCR <- ""
 refWorks$correctedFreq <- refWorks$Freq
+refWorks$whatCorrected <- "" #for debugging
 
-refWorks <- cleanSpecialChars(refWorks)
-refWorks <- cleanManualDuplicates(refWorks)
-refWorks <- fuzzyMatch(refWorks,.75)
+refWorks <- cleanSpecialChars(refWorks) # match after special char removal
+refWorks <- cleanManualDuplicates(refWorks) # match manually identified dupes
+refWorks <- fuzzyMatch(refWorks,.75) # automated fuzzy match
+refWorks <- correctFrequencies(refWorks) # update frequencies given found matches
+
 
 datatable(refWorks)
 ```
