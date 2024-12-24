@@ -182,7 +182,7 @@ rewriteCleanRefs <- function(coreDSEworks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\
   # most common form: so citations are aggregated, linked, and mapped properly.
   
   coreDSEworks$CR <- as.list(str_split(gsub(charExcludeList,'',coreDSEworks$CR_raw),";"))
-  coreDSEworks$CR <- lapply(coreDSEworks$debugmode, function(x) trimws(x) )
+  coreDSEworks$CR <- lapply(coreDSEworks$CR, function(x) trimws(x) )
   coreDSEworks$CR <- lapply(coreDSEworks$CR, function(x) refWorks$correctedCR[match(unlist(x), refWorks$CR)])
   coreDSEworks$CR <- lapply(coreDSEworks$CR, function(x) paste(x,collapse="; "))
   
