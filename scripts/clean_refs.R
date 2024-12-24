@@ -181,18 +181,10 @@ rewriteCleanRefs <- function(coreDSEworks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\
   # actual reference list of coreDSEworks are replaced with the
   # most common form: so citations are aggregated, linked, and mapped properly.
   
-  for( coreWorkID in 1:nrow(coreDSEworks) ) {
-    # pull apart the refList for this core work into a dataframe
-    thisRefsList <- as.data.frame(str_split(coreDSEworks$CR_raw[coreWorkID],";"))
-    coreDSEworks$debugmode[coreWorkID] <- str_split(coreDSEworks$CR_raw[coreWorkID],";")
-    colnames(thisRefsList) <- c("ref")
-    thisRefsList$ref <- gsub(charExcludeList,'',thisRefsList$ref)
-    
-    # use cleanRefs lookup to replace duplicate records with main
-    thisRefsList[] <- refWorks$correctedCR[match(unlist(thisRefsList), refWorks$CR)]
-    
-    # stitch it all back together and put it back in the core work
-    coreDSEworks$CR[coreWorkID] <- paste(thisRefsList$ref,collapse="; ")
-  }
+  coreDSEworks$CR <- as.list(str_split(gsub(charExcludeList,'',coreDSEworks$CR_raw),";"))
+  coreDSEworks$CR <- lapply(coreDSEworks$debugmode, function(x) trimws(x) )
+  coreDSEworks$CR <- lapply(coreDSEworks$CR, function(x) refWorks$correctedCR[match(unlist(x), refWorks$CR)])
+  coreDSEworks$CR <- lapply(coreDSEworks$CR, function(x) paste(x,collapse="; "))
+  
   return( coreDSEworks )
 }
