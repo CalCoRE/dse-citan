@@ -131,7 +131,7 @@ datatable(showabit)
 #| output: false
 
 source("scripts/clean_refs.R")
-charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*\\’]'
+charExcludeList <- '[\r\n\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*\\’]'
 refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
 
 refWorks$correctedCR <- ""
