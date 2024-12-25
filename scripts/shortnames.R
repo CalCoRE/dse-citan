@@ -11,7 +11,7 @@ refShortNames <- function(refWorks) {
   shortname <- tolower(paste0(
     word(refWorks$correctedCR), # first word (last name)
     " ",  
-    word(refWorks$correctedCR,2), #second word (first initial)
+    substr(word(refWorks$correctedCR,2),0,1), #second word (first initial)
     " ",
     str_extract(refWorks$correctedCR,regex("\\b(19|20)\\d{2}\\b")) #year
   ))
@@ -26,24 +26,31 @@ refShortNames <- function(refWorks) {
     # get all nonzero-after-correction records with this shortname
     records <- refWorks %>%
       filter(correctedFreq > 0) %>%
-      filter(shortname %in% parentRefShortnames$shortname[i] )
+      filter(shortname %in% parentRefShortnames$shortname[i] ) %>%
+      arrange(desc(correctedFreq))
     
     # if there's more than one record, append numbers to identify each
     # the most popular is appended -1
-    if( count( records ) > 4 ) {
-      indices <- which(
-        refWorks$shortname == parentRefShortnames$shortname[i] &
-          refWorks$correctedFreq > 0, arr.ind = TRUE)
+    if( count( records ) > 3 ) {
+      print(paste("Multiple records for shortname ",parentRefShortnames$shortname[i]))
+      
+      indices <- refWorks %>% 
+        filter(shortname == parentRefShortnames$shortname[i]) %>%
+        filter(correctedFreq > 0) %>%
+        arrange(desc(correctedFreq))
+      #indices <- which(
+      #  refWorks$shortname == parentRefShortnames$shortname[i] &
+      #    refWorks$correctedFreq > 0, arr.ind = TRUE)
       append = 1
-      for( index in indices ) {
+      for( ref in indices$CR ) {
         # if there are more than two records, let us know the name to check
         # for dupes
-        refWorks[index,]$shortname <- paste0(
-          refWorks$shortname[index] , "-", append )
+        refWorks[refWorks$CR==ref,]$shortname <- paste0(
+          refWorks[refWorks$CR==ref,]$shortname, "-", append )
 
         append <- append + 1
         
-        if( refWorks[index,]$correctedFreq > 2 ) {print(refWorks[index,]$shortname)}
+        print(ref)
       }
     }
   }
