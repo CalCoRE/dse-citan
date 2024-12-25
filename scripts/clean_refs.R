@@ -70,15 +70,16 @@ cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
   count <- 0
   
   # for each item in refWorks
-  for( referenceID in 1:nrow(refWorks) ) {
-    compareTo <- refWorks$CR[referenceID]
+  for( refCR in refWorks$CR ) {
+    compareTo <- refWorks[refWorks$CR==refCR,]$CR
     
     # if this reference is one of the ones that needs to be manually corrected
     if( compareTo %in% manual$CR ) {
       # then set the correctedCR for this ref to the manual correction
-      refWorks$correctedCR[referenceID] <- 
+      refWorks[refWorks$CR==refCR,]$correctedCR <- 
         manual$correctedCR[manual$CR==compareTo]
-      refWorks$whatCorrected[referenceID] <- paste(refWorks$whatCorrected[referenceID],"manualfirstloop")
+      refWorks[refWorks$CR==refCR,]$whatCorrected <- 
+        paste(refWorks[refWorks$CR==refCR,]$whatCorrected,"manualfirstloop")
       count <- count + 1
     }
   }
