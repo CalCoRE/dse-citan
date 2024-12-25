@@ -152,7 +152,7 @@ datatable(refWorks)
 
 # give a sneak peek
 showabit <- refWorks %>% arrange(desc(correctedFreq))
-datatable(showabit[c(1,5,2,4,3)])
+datatable(showabit[c(1,2,4,3)])
 ```
 
 Finally, the lookup table is used to replace all duplicate versions of a given reference that appear in the original coreDSEworks dataframe with the corrected version. This ensures that when the reference citation analysis is applied to the coreDSEworks, all versions of citations that correspond to a given reference are appropriately consolidated in the construction of the reference network and associated node measures.
@@ -160,8 +160,6 @@ Finally, the lookup table is used to replace all duplicate versions of a given r
 ```{r}
 # Replace refs lists in the core works datatable with cleaned refs
 coreDSEworks <- rewriteCleanRefs(coreDSEworks,charExcludeList)
-
-datatable(coreDSEworks[c(27,91,93)])
 ```
 
 #### Indexing Between Core and Reference Works
