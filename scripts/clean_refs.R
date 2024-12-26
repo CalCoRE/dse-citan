@@ -130,7 +130,7 @@ fuzzyMatch <- function(refWorks,threshold=.80) {
         # then uncorrected freq. if there are ties, just whatever gets sorted 
         # to the top wins.
         correctCR <- (matchGroup %>% 
-                        arrange(desc(correctedFreq),desc(Freq)))[1,]$CR
+                        arrange(desc(correctedFreq),desc(Freq)))[1,]$correctedCR 
         
         # pull the parent out of the reference group
         matchGroup <- matchGroup[matchGroup$CR!=correctCR,]
