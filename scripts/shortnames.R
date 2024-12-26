@@ -31,7 +31,7 @@ refShortNames <- function(refWorks) {
     
     # if there's more than one record, append numbers to identify each
     # the most popular is appended -1
-    if( count( records ) > 3 ) {
+    if( count( records ) > 1 ) {
       print(paste("Multiple records for shortname ",parentRefShortnames$shortname[i]))
       
       indices <- refWorks %>% 
