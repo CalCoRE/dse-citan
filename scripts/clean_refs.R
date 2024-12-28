@@ -35,34 +35,32 @@ mapCleanRefs <- function(refWorks) {
 cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]') {
   count <- nrow(refWorks)
   
-  refWorks$counted <- FALSE
-  
   for( referenceID in 1:nrow(refWorks) ) { # for each refwork
-    if( ! refWorks$counted[referenceID] ) { #if not already counted
-      compareTo <- refWorks$CR[referenceID] # use this name to compare others
-      matchGroup <- refWorks[refWorks$CR==compareTo,] # copy the matches
+    compareTo <- refWorks$CR[referenceID] # use this name to compare others
+    matchGroup <- refWorks[refWorks$CR==compareTo,] # copy the matches
+    
+    if( nrow( matchGroup ) > 1 ) { # if more than one match
+      print("found match group",nrow( matchGroup ))
+      tally <- sum(refWorks[refWorks$CR==compareTo,]$Freq) #tally all match freq
       
-      if( nrow( matchGroup ) > 1 ) { # if more than one match
-        
-        # first set all the matching refWorks to 0 frequency and counted = true
-        refWorks[refWorks$CR==compareTo,]$counted <- TRUE
-        refWorks[refWorks$CR==compareTo,]$whatCorrected <- paste(refWorks[refWorks$CR==compareTo,]$whatCorrected,"specialchars")
-        
-        # except set my parent back to the sum of frequencies in matchGroup
-        # and set the parent as uncounted; still subject
-        # to further aggregation in subsequent steps
-        refWorks$counted[referenceID] <- FALSE
-        refWorks$whatCorrected[referenceID] <- ""
-      }
+      # first set all the matching refWorks to 0 frequency
+      refWorks[refWorks$CR==compareTo,]$whatCorrected <- 
+        paste(refWorks[refWorks$CR==compareTo,]$whatCorrected,"specialchars")
+      refWorks[refWorks$CR==compareTo,]$Freq <- 0
+      
+      # except set my parent back to the sum of frequencies in matchGroup
+      # and set the parent as uncounted; still subject
+      # to further aggregation in subsequent steps
+      refWorks$whatCorrected[referenceID] <- "specialchars"
+      refWorks$Freq[referenceID] <- tally
     }
   }
-  refWorksMatchesRemoved <- refWorks[!refWorks$counted,]
   
   print(paste("Removed",
-              count-nrow(refWorksMatchesRemoved),
+              count-nrow(refWorks %>% filter(Freq > 0)),
               "duplicate records with special characters."))
   
-  return(refWorksMatchesRemoved) # drop the refs that were duplicates
+  return(refWorks %>% filter(Freq > 0)) # drop the refs that were duplicates
 }
 
 cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
@@ -115,7 +113,6 @@ fuzzyMatch <- function(refWorks,threshold=.80) {
       # make a group from the refs that match the middle threshold %
       # length * (1-threshold) * .5
       matchGroup <- refWorks %>% 
-        filter( !counted ) %>% #that haven't already been captured manually
         filter( CR %like% 
                   substr(currentCorrectedCR,
                          str_length(currentCorrectedCR) * (1 - threshold) * .5,
@@ -139,7 +136,7 @@ fuzzyMatch <- function(refWorks,threshold=.80) {
         count <- count + nrow(matchGroup)
         
         refWorks[refWorks$CR %in% matchGroup$CR,]$correctedCR <- correctCR
-        refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected <- paste(refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected,"auto-match group")
+        refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected <- paste(refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected,"auto-match group",correctCR)
       }
     } 
     bar <- bar + 1
