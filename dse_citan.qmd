@@ -137,29 +137,31 @@ refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
 refWorks$correctedCR <- ""
 refWorks$correctedFreq <- refWorks$Freq
 refWorks$whatCorrected <- "" #for debugging
+coreDSEworks$raw_stripped_CR <- 
+  as.list(str_split(gsub(charExcludeList,'',coreDSEworks$CR_raw),";")) #for debugging
 
 refWorks <- cleanSpecialChars(refWorks) # match after special char removal
 refWorks <- cleanManualDuplicates(refWorks) # match manually identified dupes
 refWorks <- fuzzyMatch(refWorks,.75) # automated fuzzy match
-refWorks <- correctFrequencies(refWorks) # update frequencies given found matches
-
 
 datatable(refWorks)
-```
-
-```{r}
-#| label: sneak-peek-refs
-
-# give a sneak peek
-showabit <- refWorks %>% arrange(desc(correctedFreq))
-datatable(showabit[c(1,2,4,3)])
 ```
 
 Finally, the lookup table is used to replace all duplicate versions of a given reference that appear in the original coreDSEworks dataframe with the corrected version. This ensures that when the reference citation analysis is applied to the coreDSEworks, all versions of citations that correspond to a given reference are appropriately consolidated in the construction of the reference network and associated node measures.
 
 ```{r}
+#| label: tally-corrected-refs-in-coreDSEworks
 # Replace refs lists in the core works datatable with cleaned refs
 coreDSEworks <- rewriteCleanRefs(coreDSEworks,charExcludeList)
+
+refWorks <- correctFrequenciesCited(refWorks,coreDSEworks) # update frequencies given found matches in coreDSEworks
+```
+
+Now, we can check the NASEM report "Data Science Opportinities and Options" one more time and see that its various references formats have been consolidated, and this report appears near the top in terms of citation frequency across the coreDSEworks.
+
+```{r}
+#| label: peek-corrected-nasem2018
+
 ```
 
 #### Indexing Between Core and Reference Works
@@ -176,13 +178,24 @@ coreDSEworks <- coreShortNames(coreDSEworks,refWorks)
 datatable(refWorks)
 ```
 
+Carmichael Data Science cs Statistics Two Cultures
+
+```         
+CETINKAYA-RUNDEL M DANYLUK A FORBES J POSNER M BUILDING BRIDGES FOR DATA SCIENCE EDUCATION PROCEEDINGS OF THE 50TH ACM TECHNICAL SYMPOSIUM ON COMPUTER SCIENCE EDUCATION SIGCSE 19 2019
+```
+
+```         
+MSWELI NT MAWELA T TWINOMURINZI H DATA SCIENCE EDUCATION–A SCOPING REVIEW JOURNAL OF INFORMATION TECHNOLOGY EDUCATION RESEARCH 22 PP 263-294 2023
+```
+
 In cases where more than one reference exists from the same first author in the same year, shortnames are appended with a number, by descending citation frequency. This, too, replicates shortnames as they appear in the `refNetwork`. For example, below are shortnames for multiple distinct reference works in 2018, for which R Biehler served as first author:
 
 ```{r}
 #| label: illustrate-shortnames
 
-datatable(refWorks[c(1,4,6)] %>% 
-            filter(shortname %like% "sangsawang t 2006"))
+datatable(refWorks[c(1,4,7)] %>% 
+            filter(refWorks$shortname %like% "sangsawang t 2006") %>%
+            filter(correctedFreq > 0))
 ```
 
 ## Analysis
@@ -238,10 +251,8 @@ Fig 3 features a visualization of the reference co-citation network of all paper
 ```{r}
 #| label: visualize-ref-net
 
-# I set a cutoff to include only papers referenced 3 or more times in the
-# network. The clusters, however, are robust to cutoff changes
 cutoff = as.integer(count(refWorks %>% filter(Freq>2)))
-refNet=networkPlot(refMatrix, n = cutoff,
+refNet=networkPlot(refMatrix, n = 1,
                    Title = "Co-Citation Network of Top DSE Reference Works",
                    size.cex=TRUE, size=15, remove.multiple=FALSE,
                    remove.isolates = TRUE, labelsize=.7, edgesize = 5,
@@ -290,7 +301,7 @@ relevantRefs <- refWorks %>%
 
 datatable(refBrokers)
 
-datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(1,3,9,10)] )
+datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(1,3,8,9)] )
 ```
 
 As is evident in the table, the most frequently cited "broker" reference works are [@deveaux2017],[@medicine2018],[@cleveland2001]
@@ -315,20 +326,34 @@ referenceClusterAuthors <- refNet[["cluster_res"]] %>%
 
 referenceClusterAuthors
 
-#getClusterHub <- function(i) {
-#  clusterLookup <- referenceClusterAuthors$authors[[i]]
-#  return( refWorks %>%
-#    filter( correctedFreq > 0 ) %>% 
-#    filter( !is.na( shortname ) ) %>% 
-#    filter( shortname %in% clusterLookup ) %>%
-#    arrange( desc(correctedFreq) ) )
-#}
+getClusterHub <- function(i) {
+  clusterLookup <- referenceClusterAuthors$authors[[i]]
+  return( refWorks %>%
+    filter( correctedFreq > 0 ) %>% 
+    filter( !is.na( shortname ) ) %>% 
+    filter( shortname %in% clusterLookup ) %>%
+    arrange( desc(correctedFreq) ) )
+}
 
-#getClusterHub(1)
+getClusterHub(1)
 
-#getClusterHub(2)
+getClusterHub(2)
 
-#getClusterHub(3)
+getClusterHub(3)
+```
+
+```{r}
+# i can probably do this without looping with an apply of some kind...
+for( i in 1:nrow(coreDSEworks) ) {
+  coreDSEworks$refInfo[i] <- refNet[["cluster_res"]] %>% 
+       filter( str_detect(vertex, coreDSEworks$shortnameRefs[i]) == TRUE ) %>%
+    select(cluster)
+}
+
+coreCitingWorks <- coreDSEworks %>% 
+  filter( length(coreDSEworks$refInfo) > 15 )
+
+datatable(coreCitingWorks)
 ```
 
 ## Intellectual Foundations of Data Science Education
