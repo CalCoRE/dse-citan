@@ -15,6 +15,7 @@ refShortNames <- function(refWorks) {
     " ",
     str_extract(refWorks$correctedCR,regex("\\b(19|20)\\d{2}\\b")) #year
   ))
+  
   # get commas out
   refWorks$shortname <- gsub(',','',shortname)
   
@@ -32,15 +33,15 @@ refShortNames <- function(refWorks) {
     # if there's more than one record, append numbers to identify each
     # the most popular is appended -1
     if( count( records ) > 1 ) {
-      print(paste("Multiple records for shortname ",parentRefShortnames$shortname[i]))
+      # Uncomment the line below to print shortnames that need appending.
+      # This can be useful for identifying duplicate records.
+      # print(paste("Multiple records for shortname ",
+      #            parentRefShortnames$shortname[i]))
       
       indices <- refWorks %>% 
         filter(shortname == parentRefShortnames$shortname[i]) %>%
         filter(correctedFreq > 0) %>%
         arrange(desc(correctedFreq))
-      #indices <- which(
-      #  refWorks$shortname == parentRefShortnames$shortname[i] &
-      #    refWorks$correctedFreq > 0, arr.ind = TRUE)
       append = 1
       for( ref in indices$CR ) {
         # if there are more than two records, let us know the name to check
@@ -50,7 +51,9 @@ refShortNames <- function(refWorks) {
 
         append <- append + 1
         
-        print(ref)
+        # Uncomment the line below to print refs associated with each shortname. 
+        # This can be useful for identifying duplicate records.
+        #print(ref)
       }
     }
   }
