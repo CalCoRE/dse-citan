@@ -21,13 +21,6 @@ mapCleanRefs <- function(refWorks) {
   
   # PART 3
   refWorks <- fuzzyMatch(refWorks,.80)
-  
-  # manual disaggregation of GAISE II vs GAISE COLLEGE
-  #refWorks[refWorks$CR=="BARGAGLIOTTI A FRANKLIN C ARNOLD P GOULD R JOHNSON S PEREZ L SPANGLER DA PRE-K-12 GUIDELINES FOR ASSESSMENT AND INSTRUCTION IN STATISTICS EDUCATION II GAISE II 2020",]$correctedCR <- ""
-  #refWorks[refWorks$CR=="DATA SCIENCE FOR UNDERGRADUATES OPPORTUNITIES AND OPTIONS 2018",]$correctedFreq <-
-  #  refWorks[refWorks$CR=="DATA SCIENCE FOR UNDERGRADUATES OPPORTUNITIES AND OPTIONS 2018",]$correctedFreq -
-  #  refWorks[refWorks$CR=="BARGAGLIOTTI A FRANKLIN C ARNOLD P GOULD R JOHNSON S PEREZ L SPANGLER DA PRE-K-12 GUIDELINES FOR ASSESSMENT AND INSTRUCTION IN STATISTICS EDUCATION II GAISE II 2020",]$Freq
-
 
   return(refWorks)  
 }
@@ -40,7 +33,6 @@ cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€
     matchGroup <- refWorks[refWorks$CR==compareTo,] # copy the matches
     
     if( nrow( matchGroup ) > 1 ) { # if more than one match
-      print("found match group",nrow( matchGroup ))
       tally <- sum(refWorks[refWorks$CR==compareTo,]$Freq) #tally all match freq
       
       # first set all the matching refWorks to 0 frequency
@@ -57,10 +49,13 @@ cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€
   }
   
   print(paste("Removed",
-              count-nrow(refWorks %>% filter(Freq > 0)),
-              "duplicate records with special characters."))
+              count-nrow(refWorks %>% 
+                           filter(Freq > 0) %>% 
+                           filter(str_length(CR) > 10)),
+              "duplicate  and too-short refs given special chars."))
   
-  return(refWorks %>% filter(Freq > 0)) # drop the refs that were duplicates
+  # drop the refs that were duplicates
+  return(refWorks %>% filter(Freq > 0) %>% filter(str_length(CR) > 10)) 
 }
 
 cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
@@ -147,7 +142,11 @@ fuzzyMatch <- function(refWorks,threshold=.80) {
   return( refWorks )
 }
 
-correctFrequencies <- function(refworks) {
+# this function aggregates ref frequencies across all CR listed in refWorks
+# to the parent correctedCR. This will overcount when a reference appears 
+# more than once in the same ref list. It is useful when used in combo with
+# the lookup-based counter below to triangulate findings.
+correctFrequenciesAgg <- function(refworks) {
   # after all the item corrections are done, tally up the sums
   
   # for each reference with a correction
@@ -168,6 +167,27 @@ correctFrequencies <- function(refworks) {
     }
   }
   
+  print(paste("We now have",
+              nrow(refWorks %>% filter(correctedFreq > 0)),
+              "parent refs."))
+  return(refWorks)
+}
+
+# this function aggregates ref frequencies by identifying the number of 
+# records in coreDSEworks that include the reference in the CR list.
+# this is the aggregation that's used in the analysis reported.
+correctFrequenciesCited <- function(refworks,coreDSEworks) {
+  # after all the item corrections are done, tally up the sums
+  refWorks$correctedFreqTwo <- 0
+  
+  # for each reference with a correction
+  for( correctCR in refWorks$correctedCR ) {
+
+    refWorks[refWorks$CR==correctCR,]$correctedFreqTwo <- 
+      sum(str_detect(coreDSEworks$CR, correctCR), na.rm=TRUE)
+  
+  }
+
   print(paste("We now have",
               nrow(refWorks %>% filter(correctedFreq > 0)),
               "parent refs."))
