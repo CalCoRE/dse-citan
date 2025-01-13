@@ -35,15 +35,24 @@ refWorks <- as.data.frame(
 # to be incorrectly counted and mapped. Below I'm making a lookup
 # table that maps all the less common (but matching) reference formats
 # back to whatever the most popular form of the reference is.
-charExcludeList <- '[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*\\’]'
+charExcludeList <- '[\r\n\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*\\’]'
 refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
-refWorks <- mapCleanRefs(refWorks)
+
+refWorks$correctedCR <- ""
+refWorks$freqAgg <- refWorks$Freq
+
+refWorks <- cleanSpecialChars(refWorks) 
+refWorks <- cleanManualDuplicates(refWorks) 
+refWorks <- textMatch(refWorks,.75)
 #cleanRefLookup <- read.csv("data/Jul30refworks.csv")
 
 # Replace refs list in the core works with cleaned refs
-coreDSEworks <- cleanRefs(coreDSEworks)
+coreDSEworks <- rewriteCleanRefs(coreDSEworks,charExcludeList)
 
-# create shortnames and add them as a new ref list to coreDSEworks
+# update frequencies given found matches in coreDSEworks
+refWorks <- correctFrequenciesCited(refWorks,coreDSEworks)
+
+# add shortnames
 refWorks <- refShortNames(refWorks)
 coreDSEworks <- coreShortNames(coreDSEworks,refWorks)
 
@@ -70,7 +79,7 @@ refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
 # Map the network featured in the proposal text.
 # I set a cutoff to include only papers referenced 3 or more times in the
 # network. The clusters, however, are robust to cutoff changes
-cutoff = as.integer(count(refWorks %>% filter(Freq>2)))
+cutoff = as.integer(count(refWorks %>% filter(freqCit>2)))
 refNet=networkPlot(refMatrix, n = cutoff,
                    Title = "Co-Citation Network of Top DSE Reference Works",
                    size.cex=TRUE, size=15, remove.multiple=FALSE,
