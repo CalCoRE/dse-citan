@@ -1,4 +1,4 @@
-refShortNames <- function(refWorks) {
+refShortNames <- function(refWorks,n=1) {
   # let's approximate the shortnames of the references so we can map
   # them to the network analyses below. Note there will
   # be duplicate shortnames for some records, but we're only interested in the
@@ -26,13 +26,13 @@ refShortNames <- function(refWorks) {
   for( i in 1:nrow(parentRefShortnames) ) {
     # get all nonzero-after-correction records with this shortname
     records <- refWorks %>%
-      filter(correctedFreq > 0) %>%
+      filter(freqCit > 0) %>%
       filter(shortname %in% parentRefShortnames$shortname[i] ) %>%
-      arrange(desc(correctedFreq))
+      arrange(desc(freqCit))
     
     # if there's more than one record, append numbers to identify each
     # the most popular is appended -1
-    if( count( records ) > 1 ) {
+    if( count( records ) > n ) {
       # Uncomment the line below to print shortnames that need appending.
       # This can be useful for identifying duplicate records.
       # print(paste("Multiple records for shortname ",
@@ -40,8 +40,8 @@ refShortNames <- function(refWorks) {
       
       indices <- refWorks %>% 
         filter(shortname == parentRefShortnames$shortname[i]) %>%
-        filter(correctedFreq > 0) %>%
-        arrange(desc(correctedFreq))
+        filter(freqCit > 0) %>%
+        arrange(desc(freqCit))
       append = 1
       for( ref in indices$CR ) {
         # if there are more than two records, let us know the name to check
