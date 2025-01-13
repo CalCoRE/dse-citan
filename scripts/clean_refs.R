@@ -20,7 +20,7 @@ mapCleanRefs <- function(refWorks) {
   refWorks <- cleanManualDuplicates(refWorks,"./data/manualdupes.txt")
   
   # PART 3
-  refWorks <- fuzzyMatch(refWorks,.80)
+  refWorks <- autoMatch(refWorks,.80)
 
   return(refWorks)  
 }
@@ -36,14 +36,14 @@ cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€
       tally <- sum(refWorks[refWorks$CR==compareTo,]$Freq) #tally all match freq
       
       # first set all the matching refWorks to 0 frequency
-      refWorks[refWorks$CR==compareTo,]$whatCorrected <- 
-        paste(refWorks[refWorks$CR==compareTo,]$whatCorrected,"specialchars")
+      #refWorks[refWorks$CR==compareTo,]$whatCorrected <- 
+      #  paste(refWorks[refWorks$CR==compareTo,]$whatCorrected,"specialchars")
       refWorks[refWorks$CR==compareTo,]$Freq <- 0
       
       # except set my parent back to the sum of frequencies in matchGroup
       # and set the parent as uncounted; still subject
       # to further aggregation in subsequent steps
-      refWorks$whatCorrected[referenceID] <- "specialchars"
+      #refWorks$whatCorrected[referenceID] <- "specialchars"
       refWorks$Freq[referenceID] <- tally
     }
   }
@@ -71,8 +71,8 @@ cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
       # then set the correctedCR for this ref to the manual correction
       refWorks[refWorks$CR==refCR,]$correctedCR <- 
         manual$correctedCR[manual$CR==compareTo]
-      refWorks[refWorks$CR==refCR,]$whatCorrected <- 
-        paste(refWorks[refWorks$CR==refCR,]$whatCorrected,"manualfirstloop")
+      #refWorks[refWorks$CR==refCR,]$whatCorrected <- 
+      #  paste(refWorks[refWorks$CR==refCR,]$whatCorrected,"manualfirstloop")
       count <- count + 1
     }
   }
@@ -85,7 +85,7 @@ cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
 }
 
 
-fuzzyMatch <- function(refWorks,threshold=.80) {
+autoMatch <- function(refWorks,threshold=.80) {
   count <- 0
   
   # referenceID'm matching on the middle thresold % of the ref. if there are 
@@ -122,7 +122,7 @@ fuzzyMatch <- function(refWorks,threshold=.80) {
         # then uncorrected freq. if there are ties, just whatever gets sorted 
         # to the top wins.
         correctCR <- (matchGroup %>% 
-                        arrange(desc(correctedFreq),desc(Freq)))[1,]$correctedCR 
+                        arrange(desc(freqAgg),desc(Freq)))[1,]$correctedCR 
         
         # pull the parent out of the reference group
         matchGroup <- matchGroup[matchGroup$CR!=correctCR,]
@@ -131,12 +131,12 @@ fuzzyMatch <- function(refWorks,threshold=.80) {
         count <- count + nrow(matchGroup)
         
         refWorks[refWorks$CR %in% matchGroup$CR,]$correctedCR <- correctCR
-        refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected <- paste(refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected,"auto-match group",correctCR)
+        #refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected <- paste(refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected,"auto-match group",correctCR)
       }
     } 
     bar <- bar + 1
   }
-  print(paste("Found",count,"additional matches using fuzzy text."))
+  print(paste("\nFound",count,"additional like text matches."))
   
   
   return( refWorks )
@@ -159,16 +159,16 @@ correctFrequenciesAgg <- function(refworks) {
       totalRefs <- sum( refWorks[refWorks$correctedCR==correctCR,]$Freq )
       
       #set all the corretedFreq to 0 transfer to parent
-      refWorks[refWorks$correctedCR==correctCR,]$correctedFreq <- 0
+      refWorks[refWorks$correctedCR==correctCR,]$freqAgg <- 0
       
       # assign the sum of all frequencies to the parent
-      refWorks[refWorks$CR==correctCR,]$correctedFreq <- totalRefs
+      refWorks[refWorks$CR==correctCR,]$freqAgg <- totalRefs
       
     }
   }
   
   print(paste("We now have",
-              nrow(refWorks %>% filter(correctedFreq > 0)),
+              nrow(refWorks %>% filter(freqAgg > 0)),
               "parent refs."))
   return(refWorks)
 }
@@ -178,18 +178,22 @@ correctFrequenciesAgg <- function(refworks) {
 # this is the aggregation that's used in the analysis reported.
 correctFrequenciesCited <- function(refworks,coreDSEworks) {
   # after all the item corrections are done, tally up the sums
-  refWorks$correctedFreqTwo <- 0
+  refWorks$freqCit <- 0
+  
+  pb = txtProgressBar(min = 0, max = nrow(refWorks), initial = 0, style = 3)
+  bar <- 0
   
   # for each reference with a correction
   for( correctCR in refWorks$correctedCR ) {
 
-    refWorks[refWorks$CR==correctCR,]$correctedFreqTwo <- 
+    refWorks[refWorks$CR==correctCR,]$freqCit <- 
       sum(str_detect(coreDSEworks$CR, correctCR), na.rm=TRUE)
-  
+    
+    bar <- bar + 1
   }
 
   print(paste("We now have",
-              nrow(refWorks %>% filter(correctedFreq > 0)),
+              nrow(refWorks %>% filter(freqCit > 0)),
               "parent refs."))
   return(refWorks)
 }
@@ -206,3 +210,6 @@ rewriteCleanRefs <- function(coreDSEworks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\
   
   return( coreDSEworks )
 }
+
+# future? cited with.... can identify the clusters of works alongside which
+# this work is cited. Will be more useful for determining cutoffs.
