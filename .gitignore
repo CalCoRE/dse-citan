@@ -4,7 +4,8 @@
 .Rproj.user/*
 VOSviewer.jar
 vosnetwork.net
-dse_citan_files/*
+dse_citan_files/figure-html/*
+dse_citan_files/libs/*
 dse_citan.html
 data/.DS_Store
 scripts/.DS_Store
@@ -13,3 +14,5 @@ data/Jul27refworks.csv
 data/Jul29refworks.csv
 dse_citan.RData
 .Rproj.user
+dse-citan.Rproj
+vosnetwork.net
