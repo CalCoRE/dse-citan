@@ -40,7 +40,7 @@ MSWELI NT MAWELA T TWINOMURINZI H DATA SCIENCE EDUCATION–A SCOPING REVIEW JOUR
 ```
 
 |  |  |
-|----|----|
+|------------------------------------|------------------------------------|
 | MEMARIAN B, 2024, EDUC INF TECHNOL | DATA SCIENCE PEDAGOGICAL TOOLS AND PRACTICES: A SYSTEMATIC LITERATURE REVIEW |
 
 ### 1.2. Bibliometric Mapping to Understand "Voluminous, Fragmented" Fields
@@ -89,13 +89,13 @@ Consistent with the bibliometric co-citation methods described in Section 1.2, m
 
 -   Finally, `bibNetwork` describes a weighted document co-citation network of `refWorks`. It represents each record in `refWorks` as a node in the network. The more frequently a given reference document is cited by the core works, the higher the weight of the corresponding node in `bibNetwork`. Two nodes in the network are connected by an edge when both works appear in the reference list of the same core document (A, B, C, etc.). The more frequently two nodes appear together in the reference lists of core documents, the heavier the weight of the corresponding edge.
 
-![Figure 1. Three key data frames: coreDSEworks, refWorks that are cited in the coreDSEworks, and the bibNetwork that represents co-citation patterns of refWorks.](dse_citan_files/datasources.png){#data-sources}
+![Figure 1. Three key data frames: coreDSEworks, refWorks that are cited in the coreDSEworks, and the bibNetwork that represents co-citation patterns of refWorks.](dse_citan_files/datasources.png){#data-sources width="500"}
 
-### 2.1 Identifying "Core" Data Science Education Works
+### 2.1 Identifying Core Data Science Education Publications
 
 To conduct this review, I selected an intentionally narrow, but relevant and well-specified set of initial works to form the “core” set of papers meant to represent the field: publications that are indexed in either Scopus or Clarivate Analytics Web of Science and that include the specific full phrase “data science education” in the title, abstract, or keywords. As of Dec 9, 2024, this query yielded a total of 287 records after screening to remove duplicates and inappropriate records. Records deemed inappropriate included one correction statement (for which the corrected report remained included), one retraction statement and the corresponding retracted article, four full conference review records, and one full poster session review record. For each of the four excluded conference proceedings records, I confirmed that the more specific corresponding record included in the full review was included instead. For the excluded poster session review record, corresponding poster records were not available. None of the five review records that were removed included cited reference information. [Figure 2](#prisma-fig) features a PRISMA diagram describing the construction of the `coreDSEworks` corpus.
 
-![PRISMA diagram describing construction of the coreDSEworks corpus](dse_citan_files/prisma.png){#prisma-fig}
+![PRISMA diagram describing construction of the coreDSEworks corpus](dse_citan_files/prisma.png){#prisma-fig width="500"}
 
 Of the publication records that are included in the coreDSEworks corpus, seven records do not include information about cited references. Manual inspection reveals that these records are editorials and commentaries. These works represent substantive contributions to the literature, and provide information about the venues and authors that are actively contributing to the “data science education” discourse. Therefore, they were not excluded from the coreDSEworks corpus. However, because they works do not include references, only 280 records directly impact the construction of the reference works dataset and the reference co-citation network that are described in the following sections.
 
@@ -126,13 +126,13 @@ datatable(coreDSEworks[
   rownames=FALSE,
   options=list(pageLength=5),
   style='bootstrap',
-  class='table-condensed small table-striped'
+  class='table-condensed smaller table-striped'
   )
 ```
 
 Of the publication records that are included in the coreDSEworks corpus, 7 records do not include information about cited references. These records are editorials and commentaries. These works represent substantive contributions to the literature and provide information about the venues and authors that are actively contributing to the "data science education" discourse. Therefore, they were not excluded from the `coreDSEworks` corpus. However, because they works do not include references, only 277 records comprise the basis of the reference co-citation analysis component described next.
 
-### 2.2. Extracting and Cleaning Reference Works
+### 2.2. Extracting and Cleaning DSE Reference Works
 
 Next, we can construct a new dataset refWorks to represent the full set of foundational works from which the "data science education" literature represented by coreDSEworks draws. This is done by extracting the full reference lists of each coreDSEworks paper.
 
@@ -148,7 +148,7 @@ However, as noted by [@mike2023], this process is not straightforward—especial
 
 ```{r}
 #| label: demo-duplicates
-#| warnings: false
+#| output: false
 
 showabit <- refWorks %>% filter( CR %like% "DATA SCIENCE FOR UNDERGRADUATES" ) %>% head(20)
 datatable(showabit, 
@@ -203,7 +203,7 @@ datatable(refWorks[c(3,5)] %>% arrange(desc(refWorks$freqCit)) %>% head(20),
 )
 ```
 
-#### Indexing Between Core and Reference Works
+#### Indexing Between Core DSE Publications and Reference Work
 
 Shortnames function as an index to connect cited reference records in refWorks to their corresponding citing coreDSEworks. These replicate the format used by the bibliometrix analysis package when generating the cited reference network: author last name, author first initial(s), year of publication. This allows me to map insights from analysis of `bibNetwork` back to the more complete reference records in `refWorks`, and to identify . It also allows me to identify which `coreDSEworks` records demonstrate particular structural relationships to the underlying reference networks. For example, I use `bibNetwork` shortnames to identify which `coreDSEworks` draw predominantly from only one of the clusters identified in the reference work network analysis, versus which draw in a more balanced way from all three clusters.
 
@@ -233,7 +233,7 @@ datatable(biehler[c(1,5,6)] %>%
             )
 ```
 
-# Constructing the Reference Co-Citation Network
+# Constructing the DSE Reference Co-Citation Network
 
 Finally, I use the `biblioNetwork` function within the R `bibliometrix` package. This function is applied to the *cleaned* reference records of `coreDSEworks`; that is, the duplicated records that were originally extracted from the reference lists have been replaced with the cleaned, consolidated records and will be appropriately aggregated in the construction of the final reference document co-citation network. Only references that are cited at least 3 times are included in the analysis, to reduce the influence of isolated papers in favor of identifying repeated trends in the literature.
 
@@ -273,7 +273,7 @@ While these two visualization formats are intended to highlight different featur
 
 In the remainder of the results section, I first present an analysis of the structure and content of the reference network itself, to better understand the scholarly foundations of "Data Science Education". I explore the most highly cited "broker works" of this network---that is, the papers that connect across the otherwise distinct clusters in the network--- as well as the most highly cited "hub works" specific to each of the three clusters, to better understand which references distinguish these clusters from one another.
 
-### Broker Works
+### DSE Broker Works
 
 In network science, a *broker* describes a node in a network that connects otherwise distinct communities. These nodes are characterized by high betweenness centrality measures. When applied to bibliographic networks, broker works reflect papers that are referenced alongside papers that belong to otherwise distinct reference clusters. This can signal higher visibility or relevance of these works as bridges across scholarly communities.
 
@@ -316,7 +316,7 @@ As is evident in the table, the most frequently cited "broker" reference works a
 
 In general, betweenness centrality is expected to reproduce citqtion frequency. However, while many of the broker works are also frequently cited, many of the most frequently cited works do not appear in the top ten broker works, and some less frequently cited works do. For example, [@dasgupta2017] is only cite 6 times but is identified as a broker work. This means that because though it is less frequently cited, it has been cited by works that otherwise draw heavily from one one of the three smaller networked communites we describe in the following section. This reinforces the isolated nature of the three communities.
 
-### Scholarly SubCommunities
+### Three Distinct Collections of DSE Scholarly Foundations
 
 While broker works establish what different scholarly communities cite in common, identifying "hub" works that are only cited frequently alongside papers in each cluster can help highlight what distinguishes one scholarly community from another. Below, I work to characterize these communities by identifying, for each, a number of key characteristics including (1)
 
@@ -351,9 +351,30 @@ getClusterHub <- function(i) {
     filter( freqCit > 0 ) %>%
     arrange( desc(freqCit) ) )
 }
+
+# add $refInfo as quick lookup for what cluster the refs belong to
+for( i in 1:nrow(coreDSEworks) ) {
+  coreDSEworks$refInfo[i] <- refNet[["cluster_res"]] %>% 
+       filter( str_detect(vertex, coreDSEworks$shortnameRefs[i]) == TRUE ) %>% 
+    select(cluster)
+}
+
+getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
+  # filter to look at works citing at least 5 DSE refWorks
+  coreCitingWorks <- coreDSEworks %>% 
+    filter( str_count(coreDSEworks$refInfo,range) > 5 )
+  
+  # then only include those that have >75% reWorks from cluster n
+  coreCitingWorks <- coreCitingWorks %>% 
+    filter( str_count(coreCitingWorks$refInfo,as.character(n))
+            /str_count(coreCitingWorks$refInfo,range) > .75 )
+  
+  return( coreCitingWorks )
+}
+
 ```
 
-#### Community 1: A Focus on Data Science for Undergraduate Majors
+#### Community 1: A Focus on Data Science Undergraduate Majors
 
 One community is comprised of works that speak to curriculum development and strategies to introduce data science to specialists at the postsecondary level. The majority of publications are from journals that focus on Statistics and Information Sciences. It also includes papers focused on active learning techniques (CITE), and specific tools used for data work (CITE). Methodological papers include
 
@@ -373,27 +394,15 @@ In terms of pedagogy and methodology,
 ```{r}
 #| label: find-citing-core-works-cluster1
 
-# i can probably do this without looping with an apply of some kind...
-for( i in 1:nrow(coreDSEworks) ) {
-  coreDSEworks$refInfo[i] <- refNet[["cluster_res"]] %>% 
-       filter( str_detect(vertex, coreDSEworks$shortnameRefs[i]) == TRUE ) %>% 
-    select(cluster)
-}
+coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-coreCitingWorks1 <- coreDSEworks %>% 
-  filter( str_count(coreDSEworks$refInfo,"1")
-          /str_count(coreDSEworks$refInfo,"[1-3]") > .75 )
-
-coreCitingWorks1 <- coreCitingWorks1 %>%
-  filter( str_count(coreCitingWorks1$refInfo,"[1-3]") > 3 )
-
-datatable(coreCitingWorks1[c(4,6,90,93,94)])
+datatable(coreCitingWorks1[c(4,6,90,94)])
 
 coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks1))
-summary(coreBibAnalysis, max=10)
+summary(coreBibAnalysis)
 ```
 
-#### Community 2: A Focus on K-12 Education and the Learning Sciences
+#### Community 2: A Focus on K-12 Students and the Learning Sciences
 
 The second community is comprised of paper that focus on introducing data literacy and data science skills to non-majors, including at the university and pre-college levels.
 
@@ -411,21 +420,17 @@ In terms of audience and content,
 In terms of pedagogy and methodology,
 
 ```{r}
+#| label: find-citing-core-works-cluster2
 
-coreCitingWorks2 <- coreDSEworks %>% 
-  filter( str_count(coreDSEworks$refInfo,"2")
-          /str_count(coreDSEworks$refInfo,"[1-3]") > .75 )
+coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-coreCitingWorks2 <- coreCitingWorks2 %>%
-  filter( str_count(coreCitingWorks2$refInfo,"[1-3]") > 3 )
-
-datatable(coreCitingWorks2[c(4,6,90,93,94)])
+datatable(coreCitingWorks2[c(4,6,90,94)])
 
 coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks2))
-summary(coreBibAnalysis, max=10)
+summary(coreBibAnalysis)
 ```
 
-#### Community 3: Data Science with a Computing Emphasis for Non-Majors
+#### Community 3: A Focus on Computational Approaches to Data for Non-Majors
 
 The third community is comprised of researchers who are focused on introducing data science at the K-12 level, with a primary focus on the computational aspects of data science.
 
@@ -443,23 +448,44 @@ In terms of audience and content,
 In terms of pedagogy and methodology,
 
 ```{r}
+#| label: find-citing-core-works-cluster3
 
-coreCitingWorks3 <- coreDSEworks %>% 
-  filter( str_count(coreDSEworks$refInfo,"3")
-          /str_count(coreDSEworks$refInfo,"[1-3]") > .75 )
+coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-coreCitingWorks3 <- coreCitingWorks3 %>%
-  filter( str_count(coreCitingWorks3$refInfo,"[1-3]") > 3 )
-
-datatable(coreCitingWorks3[c(4,6,90,93,94)])
+datatable(coreCitingWorks3[c(4,6,90,94)])
 
 coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks3))
-summary(coreBibAnalysis, max=10)
+summary(coreBibAnalysis)
 ```
 
-### Exemplar Citing Works Per Community
+### Core DSE Works that Bridge Communities
 
 Finally, to better understand the relationship between the reference co-citation network itself and the core Data Science Education literature, I present a deeper analysis of *how* core DSE works draw from these different clusters of literature. I present an analysis of recently published Data Science Education papers that draw heavily from While the reference co-citation network represents the scholarly foundations of what currently constitutes the "Data Science Education" literature, many of the works in this network predate the emergence of the field, and many deal with proximally or even more distally related topics (e.g. Statistics Education, Learning Theory, Education Research Methodologies).
+
+```{r}
+#| label: find-bridging-works
+
+bridges <- coreDSEworks %>% 
+    filter( length(coreDSEworks$refInfo) > 5 )
+  
+#   then only include those that have >75% reWorks from cluster n
+bridges1 <- bridges %>% 
+  filter( sum(bridges$refInfo=="1") 
+          /sum(bridges$refInfo=="[1-3]") > .1 )
+  
+bridges2 <- bridges1 %>% 
+filter( sum(bridges1$refInfo=="2") 
+        /sum(bridges1$refInfo=="[1-3]") > .1 )
+    
+bridges3 <- bridges2 %>% 
+  filter( sum(bridges2$refInfo=="3") 
+        /sum(bridges2$refInfo=="[1-3]") > .1 )
+
+bridgeAnalysis <- biblioAnalysis(data.frame(bridges3))
+summary(bridgeAnalysis, max=5)
+
+datatable(bridges3[c(4,6,90,94)])
+```
 
 # Discussion
 
