@@ -180,16 +180,11 @@ correctFrequenciesCited <- function(refworks,coreDSEworks) {
   # after all the item corrections are done, tally up the sums
   refWorks$freqCit <- 0
   
-  pb = txtProgressBar(min = 0, max = nrow(refWorks), initial = 0, style = 3)
-  bar <- 0
-  
   # for each reference with a correction
   for( correctCR in refWorks$correctedCR ) {
 
     refWorks[refWorks$CR==correctCR,]$freqCit <- 
       sum(str_detect(coreDSEworks$CR, correctCR), na.rm=TRUE)
-    
-    bar <- bar + 1
   }
 
   print(paste("We now have",
