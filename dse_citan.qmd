@@ -464,7 +464,7 @@ datatable(coreCitingWorks3[c(4,6)],
             options=list(pageLength=5),
             style='bootstrap',
             class='table-condensed small table-striped'
-            ))
+            )
 ```
 
 ### Core DSE Works that Bridge Communities
@@ -494,7 +494,7 @@ datatable(bridges[c(4,6)],
             options=list(pageLength=5),
             style='bootstrap',
             class='table-condensed small table-striped'
-            ))
+            )
 ```
 
 # Discussion

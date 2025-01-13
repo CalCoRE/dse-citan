@@ -136,7 +136,7 @@ autoMatch <- function(refWorks,threshold=.80) {
     } 
     bar <- bar + 1
   }
-  print(paste("\nFound",count,"additional like text matches."))
+  print(paste("Found",count,"additional like text matches."))
   
   
   return( refWorks )
