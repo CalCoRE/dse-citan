@@ -258,7 +258,7 @@ refNet=networkPlot(refMatrix, n = cutoff,
                    remove.isolates = TRUE, labelsize=.7, edgesize = 5,
                    edges.min=0, type = "fruchterman", cluster = "louvain",
                    community.repulsion = .04)
-# louvain clustering seeks to "cut clusters at their joints"
+# louvain clustering seeks community membership
 
 # we created shortnames for all duplicates, but refNet will 
 # only create shortnames for items that are cited at least the 
@@ -396,7 +396,11 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-datatable(coreCitingWorks1[c(4,6,90,94)])
+datatable(coreCitingWorks1[c(4,6)],
+            options=list(pageLength=5),
+            style='bootstrap',
+            class='table-condensed small table-striped'
+            )
 
 coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks1))
 summary(coreBibAnalysis)
@@ -424,7 +428,11 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-datatable(coreCitingWorks2[c(4,6,90,94)])
+datatable(coreCitingWorks2[c(4,6)],
+            options=list(pageLength=5),
+            style='bootstrap',
+            class='table-condensed small table-striped'
+            )
 
 coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks2))
 summary(coreBibAnalysis)
@@ -452,10 +460,11 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-datatable(coreCitingWorks3[c(4,6,90,94)])
-
-coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks3))
-summary(coreBibAnalysis)
+datatable(coreCitingWorks3[c(4,6)],
+            options=list(pageLength=5),
+            style='bootstrap',
+            class='table-condensed small table-striped'
+            ))
 ```
 
 ### Core DSE Works that Bridge Communities
@@ -464,27 +473,28 @@ Finally, to better understand the relationship between the reference co-citation
 
 ```{r}
 #| label: find-bridging-works
+#| warning: false
 
 bridges <- coreDSEworks %>% 
-    filter( length(coreDSEworks$refInfo) > 5 )
+  filter( str_count(coreDSEworks$refInfo,"[1-3]") > 5 )
   
-#   then only include those that have >75% reWorks from cluster n
-bridges1 <- bridges %>% 
-  filter( sum(bridges$refInfo=="1") 
-          /sum(bridges$refInfo=="[1-3]") > .1 )
-  
-bridges2 <- bridges1 %>% 
-filter( sum(bridges1$refInfo=="2") 
-        /sum(bridges1$refInfo=="[1-3]") > .1 )
-    
-bridges3 <- bridges2 %>% 
-  filter( sum(bridges2$refInfo=="3") 
-        /sum(bridges2$refInfo=="[1-3]") > .1 )
+bridges <- bridges %>% 
+  filter( str_count(bridges$refInfo,as.character("1"))
+          /str_count(bridges$refInfo,"[1-3]") > .1 )
 
-bridgeAnalysis <- biblioAnalysis(data.frame(bridges3))
-summary(bridgeAnalysis, max=5)
+bridges <- bridges %>% 
+  filter( str_count(bridges$refInfo,as.character("2"))
+          /str_count(bridges$refInfo,"[1-3]") > .1 )
 
-datatable(bridges3[c(4,6,90,94)])
+bridges <- bridges %>% 
+  filter( str_count(bridges$refInfo,as.character("3"))
+          /str_count(bridges$refInfo,"[1-3]") > .1 )
+
+datatable(bridges[c(4,6)],
+            options=list(pageLength=5),
+            style='bootstrap',
+            class='table-condensed small table-striped'
+            ))
 ```
 
 # Discussion
