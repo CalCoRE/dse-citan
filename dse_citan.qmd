@@ -304,7 +304,7 @@ relevantRefs <- refWorks %>%
   filter(freqCit > inclusion.cite.count) %>% 
   arrange(desc(freqCit))
 
-datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(3,8,10)],
+datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(8,10)],
             rownames=FALSE,
             options=list(pageLength=10),
             style='bootstrap',
@@ -379,6 +379,8 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
 One community is comprised of works that speak to curriculum development and strategies to introduce data science to specialists at the postsecondary level. The majority of publications are from journals that focus on Statistics and Information Sciences. It also includes papers focused on active learning techniques (CITE), and specific tools used for data work (CITE). Methodological papers include
 
 ```{r}
+#| label: see-cluster-hub-1
+
 datatable(getClusterHub(1)[c(3,5)], 
             rownames=FALSE,
             options=list(pageLength=5),
@@ -393,17 +395,16 @@ In terms of pedagogy and methodology,
 
 ```{r}
 #| label: find-citing-core-works-cluster1
+#| output: false
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
 datatable(coreCitingWorks1[c(4,6)],
+            rownames=FALSE,
             options=list(pageLength=5),
             style='bootstrap',
             class='table-condensed small table-striped'
             )
-
-coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks1))
-summary(coreBibAnalysis)
 ```
 
 #### Community 2: A Focus on K-12 Students and the Learning Sciences
@@ -411,6 +412,8 @@ summary(coreBibAnalysis)
 The second community is comprised of paper that focus on introducing data literacy and data science skills to non-majors, including at the university and pre-college levels.
 
 ```{r}
+#| label: see-cluster-hub-2
+
 datatable(getClusterHub(2)[c(3,5)], 
             rownames=FALSE,
             options=list(pageLength=5),
@@ -425,17 +428,19 @@ In terms of pedagogy and methodology,
 
 ```{r}
 #| label: find-citing-core-works-cluster2
+#| output: false
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
 datatable(coreCitingWorks2[c(4,6)],
+            rownames=FALSE,
             options=list(pageLength=5),
             style='bootstrap',
             class='table-condensed small table-striped'
             )
 
 coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks2))
-summary(coreBibAnalysis)
+summary(coreBibAnalysis$SO)
 ```
 
 #### Community 3: A Focus on Computational Approaches to Data for Non-Majors
@@ -443,6 +448,8 @@ summary(coreBibAnalysis)
 The third community is comprised of researchers who are focused on introducing data science at the K-12 level, with a primary focus on the computational aspects of data science.
 
 ```{r}
+#| label: see-cluster-hub-3
+
 datatable(getClusterHub(3)[c(3,5)], 
             rownames=FALSE,
             options=list(pageLength=5),
@@ -457,10 +464,12 @@ In terms of pedagogy and methodology,
 
 ```{r}
 #| label: find-citing-core-works-cluster3
+#| output: false
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
 datatable(coreCitingWorks3[c(4,6)],
+            rownames=FALSE,
             options=list(pageLength=5),
             style='bootstrap',
             class='table-condensed small table-striped'
@@ -490,7 +499,8 @@ bridges <- bridges %>%
   filter( str_count(bridges$refInfo,as.character("3"))
           /str_count(bridges$refInfo,"[1-3]") > .1 )
 
-datatable(bridges[c(4,6)],
+datatable(bridges[c(5,4,6)],
+            rownames=FALSE,
             options=list(pageLength=5),
             style='bootstrap',
             class='table-condensed small table-striped'
