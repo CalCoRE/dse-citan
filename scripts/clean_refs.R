@@ -206,5 +206,4 @@ rewriteCleanRefs <- function(coreDSEworks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\
   return( coreDSEworks )
 }
 
-# future? cited with.... can identify the clusters of works alongside which
-# this work is cited. Will be more useful for determining cutoffs.
+# TODO: col 14 is doi. See if I can use this to make titles clickable. so cute!
