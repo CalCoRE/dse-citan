@@ -3,25 +3,25 @@ title: "dse-citan"
 author: "removed for review"
 format: 
   html:
+    toc: true
     code-fold: true
     code-summary: "Show the code"
+    embed-resources: true
 editor: visual
-theme: minty
 bibliography: references.bib
-csl: apa-6th-edition.csl
+csl: apa.csl
 ---
 
-# Mapping the Scholarly Foundations of "Data Science Education"
+# The Many Worlds of "Data Science Education"
 
-The emerging data science education research community reflects an exciting mix of scholars, disciplines, and approaches. In recent years, various conference sessions and journal issues dedicated to this topic across domains such as Computer Science, Statistics, Information and Library Sciences, Education, and the Learning Sciences.
+As readers of HDSR know well, there is wide diversity in who is involved in data science education
+research and how it is conceptualized. Navigating this landscape can be challenging, especially for those who are just entering the field or who seek complementary insights from other related domains. Different academic communities may use different terminology, or they may hold different conceptualizations for the same key terms, "talking past" one another. For example, Rosenberg & Jones (2024) present vignettes illustrating substantially different visions of what might constitute "data science education" at the K-12 level, reflecting the differing emphases of three recent special issues devoted to the topic. Publication practices and norms also differ across fields, making it hard for researchers to find relevant work. The primacy of journals, conference proceedings, and other venues such as curated blogs are dramatically different across Computer Science, Statistics, and Education, for example. Meanwhile, there are still only a few venues (including the Harvard Data Science Review and the Journal of Statistics and Data Science Education) that specifically promote data science education as an area of focus.
 
-Navigating this multidisciplinary landscape can be challenging due to its complexity and distinct publication norms and practices. For instance, researchers in Computer Science may not realize the significance of education-focused conferences like ACM SIGCSE or IEEE for sharing innovative data science research with K-12 students. Similarly, nonspecialists might struggle to identify which education journals have been particularly active in the data science education space, such as JLS, C&I, and BJET. Early childhood educators may not be aware of the excellent resources for early data literacy development available in HDSR.
+Despite these ongoing challenges, there is a general consensus that it is time to take stock and build common understandings of data science education as a field in its own right. This report contributes to these efforts by presenting a mixed-methods investigation of 287 papers that explicitly identify themselves in their title, keywords, or abstract as concerned with “data science education.” I use these works to construct a reference co-citation network from over 7,000 works extracted from these core papers' reference lists that, together, form the *de facto* foundations of data science education scholarship.
 
-These differences between fields can hinder those entering the field or seeking comprehensive literature from recognizing parallel literature(s) and identifying from the complementary insights, expertise, and methods offered by various disciplines. Different communities may adopt different definitions or conceptualizations for the same key terms, "talking past" one another, or they may create new terms for similar ideas and methods, missing opportunities for convergence and collaboration. For example, Rosenberg & Jones (2024) present caricatures of differing perspectives on what "data science education" might look like in K-12, as reflected by the different emphases of three special issues devoted to the topic that appeared in different journals.
+Analysis of the co-citation network and the works emerging from distinct suggests that while there are some shared (but not-so-shared) "broker" references that are broadly cited within the emerging data science education literature, three distinctive and conceptually coherent, but somewhat isolated clusters of reference works emerge. With attention to the audiences, themes, pedagogy, and methodologies emphasized within each cluster, I identify areas of agreement and divergence across these clusters. Some areas of divergence include at the boundary between undergraduate and K-12 data science education efforts, as well as between K-12 initiatives across cluster.
 
-Now, about a decade after the emergence of "data science education" as a distinct area of study, researchers are beginning to take stock of this landscape. In this report, I contribute to these efforts by mapping and analyzing the communities and literatures that form the foundations of data science education research. Leveraging bibliometric and network analytic methods, I examine the co-citation patterns of a focused collection of papers which identify "data science education" as a central focus. I identify a core collection of shared (but not-so-shared) broker references, as well as three distinctive, conceptually coherent, and somewhat isolated collections of reference works, each that corresponding to different disciplinary communities, publication venues, and student audiences. Through additional qualitative content analysis, I examine how these clusters suggest particular communities, methodologies, and topics reflected in the current literature. I also showcase areas of convergence as well as emerging divisions regarding undergraduate and K-12 data science education efforts, and between K-12 initiatives arising from different subfields.
-
-My goal is to raise awareness of these separations and encourage deeper engagement across subcommunities to build stronger, more coherent trajectories for data science education. To facilitate this, I provide an interactive document and open-source code for readers to explore data science education literature and clusters further. I extend a community invitation to continue mapping the field together and seeking mutual understanding, if not convergence, across disciplines. To the extent that data is a part of everyone's lives, important to conside the full lifecycle of education and points of connection.
+My goal is to raise awareness of the diversity of communities working on data science education, and to encourage deeper engagement with literature and researchers across these communities. In that spirit, this report is accompanied by an interactive open-source document that readers can use to peruse the many worlds of data science education. Understanding what we can learn from each other can support stronger, more coherent trajectories for future data science students, as well as for all students who will find themselves navigating a data-filled world.
 
 ## 1. Why Map Data Science Education Scholarship?
 
@@ -51,23 +51,19 @@ In this paper, I present a "meso" level analysis that connects the focused micro
 
 Science mapping is a particular form of bibliometric analysis that leverages data from published works to characterize the structure of scholarly fields of study. In particular, science mapping is useful for understanding the development of fields that are "." In this paper, I rely on bibliographic document co-citation analysis; this is considered one of the most used and validated bibliometric methods [@zupic2015]. Because co-citation analysis reflects bodies of work that are connected gradually over time, this sort of analysis is more appropriate to understand what Zuipc \[xxx\] describes as the "knowledge base clusters" that inform current work.
 
-From zupic:
+Science mapping is a valuable approach in bibliometric analysis that uses metadata from published works to elucidate the structure of scholarly fields, particularly those undergoing dynamic development. In this study, we utilize bibliographic document co-citation analysis, one of the most widely used and validated bibliometric methods (Zupic, xxx). Co-citation analysis identifies connections between documents based on their shared citations over time, as as determined by their mutual appearances in the reference lists of some set of focal documents. thereby revealing the "knowledge base clusters" that underpin current research (Zupic).
 
-It is the most used and validated bibliometric method. Connecting documents, authors or journals with co-citation has been shown to be reliable. Since citation is a measure of influence it offers a method to filter the most important works.
+To supplement co-citation analysis, we can also employ bibliographic coupling. Unlike co-citation analysis, bibliographic coupling is immediately available and does not require citations to accumulate (Haustein & Larivière, 2017). It can be used for new publications that are not yet cited and for emerging fields and smaller subfields. However, it is limited to a five-year interval (Haustein & Larivière). It does not inherently identify the most important works by citation counts, making it challenging to determine whether mapped publications are indeed significant or not (Haustein & Larivière).
 
 Co-citation is performed on cited articles so it is not optimal for mapping research fronts. Citations take time to accumulate so new publications cannot be connected directly but only through knowledge base clusters. Several citations are needed to map articles so it is impossible to map articles which are not cited much. When performing author co-citation analysis on SSCI (WOS) data, only first-author information is available.
 
-Complement with bibliographic coupling (exemplars only)
-
 Immediately available: does not require citations to accumulate. Can be used for new publications which are not cited yet, emerging fields and smaller subfields.
-
-It can only be used for limited timeframe (up to a five-year interval). It does not inherently identify the most important works by citation counts as cocitation; it is difficult to know whether mapped publications are important or not.
 
 Haustein and Larivière emphasize the dangers of an over-reliance on bibliometric methods to describe disciplines. I intentionally focus on structural features of co-citation, without attention to specific authors, over-reliance on citation frequency, or other.
 
 ## 2. Constructing the Bibliographic Datasets
 
-For this analysis, I make extensive use of the R `bibliometrix` package [@aria2017] for constructing, analyzing, and visualizing bibliographic records. I use the `dplyr` package for data handling [@wickham2023], and the `stringr` and `textTools` packages to process and compare scholarly reference records. The `DT` package [@dt:awr2024] is used to generate interactive data displays.
+This research leverages the R `bibliometrix` package [@aria2017] for constructing, analyzing, and visualizing bibliographic records. I use the `dplyr` package for data handling [@wickham2023], and the `stringr` and `textTools` packages to process and compare scholarly reference records. The `DT` package [@dt:awr2024] is used to generate interactive data displays.
 
 ```{r}
 #| label: load-packages-and-scripts
@@ -85,11 +81,11 @@ library(textTools)
 library(DT)
 ```
 
-Consistent with the bibliometric co-citation methods described in Section 1.2, my analysis focuses on three interrelated datasets (also illustrated in [Figure 1](#data-sources)). I introduce them briefly here, and offer more detail about their construction and cleaning in the following sections.
+Consistent with the bibliometric co-citation methods described in Section 1.2, this analysis focuses on three interrelated datasets (also illustrated in [Figure 1](#data-sources)).
 
--   A collection called `coreDSEworks` describes the set of scholarly works selected to represent the core, emerging data science education literature. These are indexed academic publications that feature the full phrase "data science education" in the title, abstract, or keywords.
+-   A collection called `coreDSEworks` describes a core set of 287 scholarly works selected to represent the core, emerging data science education literature. These are indexed academic publications that feature the full phrase "data science education" in the title, abstract, or keywords.
 
--   A second, much larger collection of scholarly works called `refWorks` represents all papers that are cited by, and are therefore taken to represent the intellectual foundations of, the emerging data science education literature. This dataset is constructed by extracting references from the bibliographies of each record in `coreDSEworks`. It is reasonable to expect that some papers will appear in both the coreDSEworks and refWorks datasets.
+-   A second, much larger collection of scholarly works called `refWorks` represents \[xxx\] distinct papers that are cited by, and are therefore constitute the *de facto* intellectual foundations of, the emerging data science education literature. This dataset is constructed by extracting references from the bibliographies of each record in `coreDSEworks`. Since papers in `coreDSEworks` cite one another, many appear in both datasets.
 
 -   Finally, `bibNetwork` describes a weighted document co-citation network of `refWorks`. It represents each record in `refWorks` as a node in the network. The more frequently a given reference document is cited by the core works, the higher the weight of the corresponding node in `bibNetwork`. Two nodes in the network are connected by an edge when both works appear in the reference list of the same core document (A, B, C, etc.). The more frequently two nodes appear together in the reference lists of core documents, the heavier the weight of the corresponding edge.
 
@@ -126,12 +122,13 @@ The titles, authors, publication venues, and publication years of each `coreDSEw
 
 datatable(coreDSEworks[
   sample(1:nrow(coreDSEworks)), 
-  c(4,1,6,5)],
-  rownames=FALSE,
-  options=list(pageLength=5),
-  style='bootstrap',
-  class='table-condensed smaller table-striped'
-  )
+  c(4,1,6,5)])
+# ,
+#   rownames=FALSE,
+#   options=list(pageLength=5),
+#   style='bootstrap',
+#   class='table-condensed small table-striped'
+#   )
 ```
 
 Of the publication records that are included in the coreDSEworks corpus, 7 records do not include information about cited references. These records are editorials and commentaries. These works represent substantive contributions to the literature and provide information about the venues and authors that are actively contributing to the "data science education" discourse. Therefore, they were not excluded from the `coreDSEworks` corpus. However, because they works do not include references, only 277 records comprise the basis of the reference co-citation analysis component described next.
@@ -155,12 +152,12 @@ However, as noted by [@mike2023], this process is not straightforward—especial
 #| output: false
 
 showabit <- refWorks %>% filter( CR %like% "DATA SCIENCE FOR UNDERGRADUATES" ) %>% head(20)
-datatable(showabit, 
-  rownames=FALSE,
-  options=list(pageLength=20),
-  style='bootstrap',
-  class='table-condensed small table-striped'
-  )
+# datatable(showabit, 
+#   rownames=FALSE,
+#   options=list(pageLength=20),
+#   style='bootstrap',
+#   class='table-condensed small table-striped'
+#   )
 ```
 
 If records such as the ones above are not consolidated, the well-known *Data Science for Undergraduates* report would be represented in the network as several isolated papers, each with only marginal impact on the field as a whole. To address this problem of duplicate records and ensure that the resulting reference co-citation network is accurate, I turn refWorks into a lookup table. Using a combination of methods including removal of special characters, automated text matching, and a manual dictionary of duplicate records screened by author and year, each text reference is mapped to a single parent format.
@@ -199,12 +196,12 @@ After consolidating citation counts across duplicate records in this way, the re
 ```{r}
 #| label: show-corrected-refs
 
-datatable(refWorks[c(3,5)] %>% arrange(desc(refWorks$freqCit)) %>% head(20), 
-  rownames=FALSE,
-  options=list(pageLength=5),
-  style='bootstrap',
-  class='table-condensed small table-striped'
-)
+# datatable(refWorks[c(3,5)] %>% arrange(desc(refWorks$freqCit)) %>% head(20), 
+#   rownames=FALSE,
+#   options=list(pageLength=5),
+#   style='bootstrap',
+#   class='table-condensed small table-striped'
+# )
 ```
 
 #### Indexing Between Core DSE Publications and Reference Work
@@ -227,14 +224,14 @@ In cases where more than one reference exists from the same first author in the 
 
 biehler <- refWorks %>% filter(shortname %like% "biehler r 2018")
 
-datatable(biehler[c(1,5,6)] %>%
-            filter(freqCit > 0) %>%
-            arrange(desc(freqCit)), 
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+# datatable(biehler[c(1,5,6)] %>%
+#             filter(freqCit > 0) %>%
+#             arrange(desc(freqCit)), 
+#             rownames=FALSE,
+#             options=list(pageLength=5),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
 # Constructing the DSE Reference Co-Citation Network
@@ -308,12 +305,12 @@ relevantRefs <- refWorks %>%
   filter(freqCit > inclusion.cite.count) %>% 
   arrange(desc(freqCit))
 
-datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(8,10)],
-            rownames=FALSE,
-            options=list(pageLength=10),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+# datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(8,10)],
+#             rownames=FALSE,
+#             options=list(pageLength=10),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
 As is evident in the table, the most frequently cited "broker" reference works are [@deveaux2017; @medicine2018; @cleveland2001]
@@ -385,15 +382,17 @@ One community is comprised of works that speak to curriculum development and str
 ```{r}
 #| label: see-cluster-hub-1
 
-datatable(getClusterHub(1)[c(3,5)], 
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+# datatable(getClusterHub(1)[c(3,5)], 
+#             rownames=FALSE,
+#             options=list(pageLength=5),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
-In terms of audience and content,
+In terms of audience and content,emphasis is on curriculum and pedgogy for undergraduate level.
+
+While there is no clear publication venue that is dominant within this collection of papers, the journals and conferences where this work appears focus on statistics education (JSDSE, TS), information technologies (Education and Information Technologies, Data Technologies and Applications, Proceedings of the Association for Infomration Science and Technology), and library science (IFLA Journal-International Federation of Library Associations, Journal of Academic Librarianship, Journal of Education for Library and Information Sciences). One focused on education (Education Sciences).
 
 In terms of pedagogy and methodology,
 
@@ -403,12 +402,12 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-datatable(coreCitingWorks1[c(4,6)],
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+#datatable(coreCitingWorks1[c(4,6)],
+#            rownames=FALSE,
+#            options=list(pageLength=5),
+#            style='bootstrap',
+#            class='table-condensed small table-striped'
+#            )
 ```
 
 #### Community 2: A Focus on K-12 Students and the Learning Sciences
@@ -418,12 +417,12 @@ The second community is comprised of paper that focus on introducing data litera
 ```{r}
 #| label: see-cluster-hub-2
 
-datatable(getClusterHub(2)[c(3,5)], 
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+# datatable(getClusterHub(2)[c(3,5)], 
+#             rownames=FALSE,
+#             options=list(pageLength=5),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
 In terms of audience and content,
@@ -436,15 +435,12 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-datatable(coreCitingWorks2[c(4,6)],
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
-
-coreBibAnalysis <- biblioAnalysis(data.frame(coreCitingWorks2))
-summary(coreBibAnalysis$SO)
+# datatable(coreCitingWorks2[c(4,6)],
+#             rownames=FALSE,
+#             options=list(pageLength=5),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
 #### Community 3: A Focus on Computational Approaches to Data for Non-Majors
@@ -454,12 +450,12 @@ The third community is comprised of researchers who are focused on introducing d
 ```{r}
 #| label: see-cluster-hub-3
 
-datatable(getClusterHub(3)[c(3,5)], 
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+# datatable(getClusterHub(3)[c(3,5)], 
+#             rownames=FALSE,
+#             options=list(pageLength=5),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
 In terms of audience and content,
@@ -472,12 +468,12 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-datatable(coreCitingWorks3[c(4,6)],
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+# datatable(coreCitingWorks3[c(4,6)],
+#             rownames=FALSE,
+#             options=list(pageLength=5),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
 ### Core DSE Works that Bridge Communities
@@ -503,12 +499,12 @@ bridges <- bridges %>%
   filter( str_count(bridges$refInfo,as.character("3"))
           /str_count(bridges$refInfo,"[1-3]") > .1 )
 
-datatable(bridges[c(5,4,6)],
-            rownames=FALSE,
-            options=list(pageLength=5),
-            style='bootstrap',
-            class='table-condensed small table-striped'
-            )
+# datatable(bridges[c(5,4,6)],
+#             rownames=FALSE,
+#             options=list(pageLength=5),
+#             style='bootstrap',
+#             class='table-condensed small table-striped'
+#             )
 ```
 
 # Discussion
