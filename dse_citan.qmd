@@ -368,7 +368,7 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
 
 ```
 
-### 4.1 World 1: Data Science Undergraduate Programs
+### 4.1 Cluster 1: Data Science Undergraduate Programs
 
 One community is comprised of works that speak to curriculum development and strategies to introduce data science to specialists at the postsecondary level. The majority of publications are from journals that focus on Statistics and Information Sciences. It also includes papers focused on active learning techniques (CITE), and specific tools used for data work (CITE). Methodological papers include
 
@@ -383,7 +383,7 @@ One community is comprised of works that speak to curriculum development and str
 #             )
 ```
 
-#### 4.1.1 Key Characteristics of World 1
+#### 4.1.1 Key Characteristics
 
 In terms of audience and content,emphasis is on curriculum and pedgogy for undergraduate level.
 
@@ -391,7 +391,7 @@ While there is no clear publication venue that is dominant within this collectio
 
 In terms of pedagogy and methodology,
 
-#### 4.1.2 Works that Cite World 1
+#### 4.1.2 Citing Works
 
 ```{r}
 #| label: find-citing-core-works-cluster1
@@ -407,7 +407,7 @@ coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 #            )
 ```
 
-### 4.2 World 2: K-12 Students and the Learning Sciences
+### 4.2 Cluster 2: K-12 Students and the Learning Sciences
 
 The second community is comprised of paper that focus on introducing data literacy and data science skills to non-majors, including at the university and pre-college levels.
 
@@ -422,13 +422,13 @@ The second community is comprised of paper that focus on introducing data litera
 #             )
 ```
 
-#### 4.2.1 Key Characteristics of World 2
+#### 4.2.1 Key Characteristics
 
 In terms of audience and content,
 
 In terms of pedagogy and methodology,
 
-#### 4.2.2 Works that Cite World 2
+#### 4.2.2 Citing Works
 
 ```{r}
 
@@ -445,7 +445,7 @@ coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 #             )
 ```
 
-### 4.3 World 3: Computational Approaches to Data for Non-Majors
+### 4.3 Cluster 3: Computational Approaches to Data for Non-Majors
 
 The third community is comprised of researchers who are focused on introducing data science at the K-12 level, with a primary focus on the computational aspects of data science.
 
@@ -460,13 +460,13 @@ The third community is comprised of researchers who are focused on introducing d
 #             )
 ```
 
-#### 4.3.1 Key Characteristics of World 3
+#### 4.3.1 Key Characteristics
 
 In terms of audience and content,
 
 In terms of pedagogy and methodology,
 
-#### 4.3.2 Works that Cite World 3
+#### 4.3.2 Citing Works
 
 ```{r}
 #| label: find-citing-core-works-cluster3
@@ -482,7 +482,7 @@ coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 #             )
 ```
 
-### 4.4 Works that Cite Across Communities
+### 4.4 Few Papers Cite across Communities
 
 Finally, to better understand the relationship between the reference co-citation network itself and the core Data Science Education literature, I present a deeper analysis of *how* core DSE works draw from these different clusters of literature. I present an analysis of recently published Data Science Education papers that draw heavily from While the reference co-citation network represents the scholarly foundations of what currently constitutes the "Data Science Education" literature, many of the works in this network predate the emergence of the field, and many deal with proximally or even more distally related topics (e.g. Statistics Education, Learning Theory, Education Research Methodologies).
 

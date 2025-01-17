@@ -43,7 +43,7 @@ refWorks$freqAgg <- refWorks$Freq
 
 refWorks <- cleanSpecialChars(refWorks) 
 refWorks <- cleanManualDuplicates(refWorks) 
-refWorks <- textMatch(refWorks,.75)
+refWorks <- autoMatch(refWorks,.75)
 #cleanRefLookup <- read.csv("data/Jul30refworks.csv")
 
 # Replace refs list in the core works with cleaned refs
