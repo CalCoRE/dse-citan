@@ -347,6 +347,10 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
     filter( str_count(coreCitingWorks$refInfo,as.character(n))
             /str_count(coreCitingWorks$refInfo,range) > .8 )
   
+  # filter out older than 5 years
+  coreCitingWorks <- coreCitingWorks %>% 
+    filter( coreCitingWorks$PY > 2019 )
+  
   return( coreCitingWorks )
 }
 
@@ -476,6 +480,8 @@ bridges <- bridges %>%
 bridges <- bridges %>% 
   filter( str_count(bridges$refInfo,as.character("3"))
           /str_count(bridges$refInfo,"[1-3]") > .1 )
+
+bridges <- bridges %>% filter(PY > 2019)
 
 datatable(bridges[c(5,4,6)],
   rownames=FALSE,
