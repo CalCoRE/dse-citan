@@ -304,8 +304,8 @@ While broker works establish what different scholarly communities cite in common
 y <- refNet[["cluster_res"]]$btw_centrality
 y[y==0] <- NA
 
-# set the cutoff to lowest 75th percentile in terms of betweenness centrality
-btw_cutoff <- quantile(y,c(.75),na.rm=TRUE)
+# set the cutoff to lowest 80th percentile in terms of betweenness centrality
+btw_cutoff <- quantile(y,c(.8),na.rm=TRUE)
 
 referenceClusterAuthors <- refNet[["cluster_res"]] %>%
   # restrict this to only authors of papers that are not very connected
@@ -345,7 +345,7 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
   # then only include those that have >90% reWorks from cluster n
   coreCitingWorks <- coreCitingWorks %>% 
     filter( str_count(coreCitingWorks$refInfo,as.character(n))
-            /str_count(coreCitingWorks$refInfo,range) > .75 )
+            /str_count(coreCitingWorks$refInfo,range) > .8 )
   
   return( coreCitingWorks )
 }
