@@ -294,7 +294,7 @@ As is evident in the table, the most frequently cited "broker" reference works a
 
 In general, betweenness centrality is expected to reproduce citqtion frequency. However, while many of the broker works are also frequently cited, many of the most frequently cited works do not appear in the top ten broker works, and some less frequently cited works do. For example, [@dasgupta2017] is only cite 6 times but is identified as a broker work. This means that because though it is less frequently cited, it has been cited by works that otherwise draw heavily from one one of the three smaller networked communites we describe in the following section. This reinforces the isolated nature of the three communities.
 
-## 4. The Three Worlds of Data Science Education
+## 4. Characterizing the Three Foundational Literatures of Data Science Education
 
 While broker works establish what different scholarly communities cite in common, identifying "hub" works that are only cited frequently alongside papers in each cluster can help highlight what distinguishes one scholarly community from another. Below, I work to characterize these communities by identifying, for each, a number of key characteristics including (1)
 
@@ -342,7 +342,7 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
   coreCitingWorks <- coreDSEworks %>% 
     filter( str_count(coreDSEworks$refInfo,range) > 5 )
   
-  # then only include those that have >75% reWorks from cluster n
+  # then only include those that have >90% reWorks from cluster n
   coreCitingWorks <- coreCitingWorks %>% 
     filter( str_count(coreCitingWorks$refInfo,as.character(n))
             /str_count(coreCitingWorks$refInfo,range) > .75 )
@@ -352,7 +352,7 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
 
 ```
 
-### 4.1 World 1: Data Science Undergraduate Programs
+### 4.1 Data Science Undergraduate Programs
 
 One community is comprised of works that speak to curriculum development and strategies to introduce data science to specialists at the postsecondary level. The majority of publications are from journals that focus on Statistics and Information Sciences. It also includes papers focused on active learning techniques (CITE), and specific tools used for data work (CITE). Methodological papers include
 
@@ -365,7 +365,7 @@ datatable(getClusterHub(1)[c(3,5)],
 )
 ```
 
-#### 4.1.1 Key Characteristics of World 1
+#### 4.1.1 Key Characteristics of Reference Works
 
 In terms of audience and content,emphasis is on curriculum and pedgogy for undergraduate level.
 
@@ -373,7 +373,7 @@ While there is no clear publication venue that is dominant within this collectio
 
 In terms of pedagogy and methodology,
 
-#### 4.1.2 Works that Cite World 1
+#### 4.1.2 Exemplar Citing Works
 
 ```{r}
 #| label: find-citing-core-works-cluster1
