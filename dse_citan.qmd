@@ -108,13 +108,10 @@ The titles, authors, publication venues, and publication years of each `coreDSEw
 
 datatable(coreDSEworks[
   sample(1:nrow(coreDSEworks)), 
-  c(4,1,6,5)])
-# ,
-#   rownames=FALSE,
-#   options=list(pageLength=5),
-#   style='bootstrap',
-#   class='table-condensed small table-striped'
-#   )
+  c(4,1,6,5)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 Of the 287 publication records that are not excluded from the coreDSEworks corpus, seven do not include information about cited references. Manual inspection reveals that these records are editorials and commentaries. Since these works represent substantive contributions to the literature, and provide information about the venues and authors that are actively contributing to the “data science education” discourse, they were retained in the coreDSEworks dataset. However, because they works do not include references, only 280 records directly impact the construction of the reference works dataset and the reference co-citation network that are described in the following sections.
@@ -138,12 +135,10 @@ As noted by [@mike2023], this process is not straightforward—especially when l
 #| output: false
 
 showabit <- refWorks %>% filter( CR %like% "DATA SCIENCE FOR UNDERGRADUATES" ) %>% head(20)
-# datatable(showabit, 
-#   rownames=FALSE,
-#   options=list(pageLength=20),
-#   style='bootstrap',
-#   class='table-condensed small table-striped'
-#   )
+datatable(showabit,
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 If records such as the ones above are not properly consolidated, duplicate scholarly works would be represented in the network as several isolated papers, each with only marginal impact on the field as a whole. To address this problem of duplicate records and ensure that the resulting reference co-citation network is accurate, I use a combination of methods including removal of special characters, automated text matching, and a manual dictionary of duplicate records screened by author and year. Each text reference that is identified as a duplicate is mapped to a single parent format, turning refWorks into a lookup table.
@@ -182,12 +177,12 @@ After consolidating citation counts across duplicate records in this way, the re
 ```{r}
 #| label: show-corrected-refs
 
-# datatable(refWorks[c(3,5)] %>% arrange(desc(refWorks$freqCit)) %>% head(20), 
-#   rownames=FALSE,
-#   options=list(pageLength=5),
-#   style='bootstrap',
-#   class='table-condensed small table-striped'
-# )
+datatable(refWorks[c(3,5)] %>% 
+            arrange(desc(refWorks$freqCit)) %>% 
+            head(100),
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 #### 2.3 Indexing Between Core DSE Publications and Reference Work
@@ -210,14 +205,12 @@ In cases where more than one reference exists from the same first author in the 
 
 biehler <- refWorks %>% filter(shortname %like% "biehler r 2018")
 
-# datatable(biehler[c(1,5,6)] %>%
-#             filter(freqCit > 0) %>%
-#             arrange(desc(freqCit)), 
-#             rownames=FALSE,
-#             options=list(pageLength=5),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(biehler[c(1,5,6)] %>%
+            filter(freqCit > 0) %>%
+            arrange(desc(freqCit)),
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 ## 3. Constructing the DSE Reference Co-Citation Network
@@ -291,12 +284,10 @@ relevantRefs <- refWorks %>%
   filter(freqCit > inclusion.cite.count) %>% 
   arrange(desc(freqCit))
 
-# datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(8,10)],
-#             rownames=FALSE,
-#             options=list(pageLength=10),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(8,10)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 As is evident in the table, the most frequently cited "broker" reference works are [@deveaux2017; @medicine2018; @cleveland2001]
@@ -368,12 +359,10 @@ One community is comprised of works that speak to curriculum development and str
 ```{r}
 #| label: see-cluster-hub-1
 
-# datatable(getClusterHub(1)[c(3,5)], 
-#             rownames=FALSE,
-#             options=list(pageLength=5),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(getClusterHub(1)[c(3,5)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 #### 4.1.1 Key Characteristics of World 1
@@ -392,12 +381,10 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-#datatable(coreCitingWorks1[c(4,6)],
-#            rownames=FALSE,
-#            options=list(pageLength=5),
-#            style='bootstrap',
-#            class='table-condensed small table-striped'
-#            )
+datatable(coreCitingWorks1[c(4,6)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 ### 4.2 World 2: K-12 Students and the Learning Sciences
@@ -407,12 +394,10 @@ The second community is comprised of paper that focus on introducing data litera
 ```{r}
 #| label: see-cluster-hub-2
 
-# datatable(getClusterHub(2)[c(3,5)], 
-#             rownames=FALSE,
-#             options=list(pageLength=5),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(getClusterHub(2)[c(3,5)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 #### 4.2.1 Key Characteristics of World 2
@@ -430,12 +415,10 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-# datatable(coreCitingWorks2[c(4,6)],
-#             rownames=FALSE,
-#             options=list(pageLength=5),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(coreCitingWorks2[c(4,6)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 ### 4.3 World 3: Computational Approaches to Data for Non-Majors
@@ -445,12 +428,10 @@ The third community is comprised of researchers who are focused on introducing d
 ```{r}
 #| label: see-cluster-hub-3
 
-# datatable(getClusterHub(3)[c(3,5)], 
-#             rownames=FALSE,
-#             options=list(pageLength=5),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(getClusterHub(3)[c(3,5)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 #### 4.3.1 Key Characteristics of World 3
@@ -467,12 +448,10 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-# datatable(coreCitingWorks3[c(4,6)],
-#             rownames=FALSE,
-#             options=list(pageLength=5),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(coreCitingWorks3[c(4,6)],
+  rownames=FALSE,
+  options=list(pageLength=5, class='compact stripe')
+)
 ```
 
 ### 4.4 Works that Cite Across Communities
@@ -498,12 +477,10 @@ bridges <- bridges %>%
   filter( str_count(bridges$refInfo,as.character("3"))
           /str_count(bridges$refInfo,"[1-3]") > .1 )
 
-# datatable(bridges[c(5,4,6)],
-#             rownames=FALSE,
-#             options=list(pageLength=5),
-#             style='bootstrap',
-#             class='table-condensed small table-striped'
-#             )
+datatable(bridges[c(5,4,6)],
+  rownames=FALSE,
+  options=list(class='compact stripe')
+)
 ```
 
 ## 5. Discussion
