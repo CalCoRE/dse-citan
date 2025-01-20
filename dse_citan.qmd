@@ -385,7 +385,7 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-datatable(coreCitingWorks1[c(4,6)],
+datatable(coreCitingWorks1[c(5,4,6)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -413,13 +413,12 @@ In terms of pedagogy and methodology,
 #### 4.2.2 Works that Cite World 2
 
 ```{r}
-
 #| label: find-citing-core-works-cluster2
 #| output: false
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-datatable(coreCitingWorks2[c(4,6)],
+datatable(coreCitingWorks2[c(5,4,6)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -452,7 +451,7 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-datatable(coreCitingWorks3[c(4,6)],
+datatable(coreCitingWorks3[c(5,4,6)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
