@@ -381,7 +381,7 @@ In terms of pedagogy and methodology,
 
 ```{r}
 #| label: find-citing-core-works-cluster1
-#| output: false
+#| warning: false
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
@@ -414,7 +414,7 @@ In terms of pedagogy and methodology,
 
 ```{r}
 #| label: find-citing-core-works-cluster2
-#| output: false
+#| warning: false
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
@@ -447,7 +447,7 @@ In terms of pedagogy and methodology,
 
 ```{r}
 #| label: find-citing-core-works-cluster3
-#| output: false
+#| warning: false
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
