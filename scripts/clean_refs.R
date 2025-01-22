@@ -26,7 +26,6 @@ mapCleanRefs <- function(refWorks) {
 }
 
 cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€œ\\â€\\,\'\\`\\â€˜\\.\\*]') {
-  count <- nrow(refWorks)
   
   for( referenceID in 1:nrow(refWorks) ) { # for each refwork
     compareTo <- refWorks$CR[referenceID] # use this name to compare others
@@ -36,23 +35,14 @@ cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€
       tally <- sum(refWorks[refWorks$CR==compareTo,]$Freq) #tally all match freq
       
       # first set all the matching refWorks to 0 frequency
-      #refWorks[refWorks$CR==compareTo,]$whatCorrected <- 
-      #  paste(refWorks[refWorks$CR==compareTo,]$whatCorrected,"specialchars")
       refWorks[refWorks$CR==compareTo,]$Freq <- 0
       
       # except set my parent back to the sum of frequencies in matchGroup
       # and set the parent as uncounted; still subject
       # to further aggregation in subsequent steps
-      #refWorks$whatCorrected[referenceID] <- "specialchars"
       refWorks$Freq[referenceID] <- tally
     }
   }
-  
-  print(paste("Removed",
-              count-nrow(refWorks %>% 
-                           filter(Freq > 0) %>% 
-                           filter(str_length(CR) > 10)),
-              "duplicate  and too-short refs given special chars."))
   
   # drop the refs that were duplicates
   return(refWorks %>% filter(Freq > 0) %>% filter(str_length(CR) > 10)) 
@@ -60,7 +50,6 @@ cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€
 
 cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
   manual <- read.csv("./data/manualdupes.txt", sep=",")
-  count <- 0
   
   # for each item in refWorks
   for( refCR in refWorks$CR ) {
@@ -71,13 +60,9 @@ cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
       # then set the correctedCR for this ref to the manual correction
       refWorks[refWorks$CR==refCR,]$correctedCR <- 
         manual$correctedCR[manual$CR==compareTo]
-      #refWorks[refWorks$CR==refCR,]$whatCorrected <- 
-      #  paste(refWorks[refWorks$CR==refCR,]$whatCorrected,"manualfirstloop")
-      count <- count + 1
     }
   }
   
-  print(paste("Mapped",count,"manual duplicate records to parents"))
   refWorks[refWorks$correctedCR == "",]$correctedCR <- 
     refWorks[refWorks$correctedCR == "",]$CR
   
@@ -86,27 +71,20 @@ cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
 
 
 autoMatch <- function(refWorks,threshold=.80) {
-  count <- 0
-  
   # referenceID'm matching on the middle thresold % of the ref. if there are 
   # multiple versions of something like a textbook, this would aggregate them. 
   # It looks at the middle part since the first and last part is where 
   # reasonable differences emerge - journal abbreviations, different levels of 
   # detail (doi, conference dates, page numbers etc).
-  pb = txtProgressBar(min = 0, max = nrow(refWorks), initial = 0, style = 3)
-  bar <- 0
   
   # for each unique correctedCR (e.g. CRs that have not already been identified
   # as duplicates)
   for( currentCorrectedCR in refWorks$correctedCR ) {
     
-    setTxtProgressBar(pb,bar)
-    
     # if there is any meat to the entry
     if( str_length(currentCorrectedCR) > 40 ) {
       
-      # make a group from the refs that match the middle threshold %
-      # length * (1-threshold) * .5
+      # make a group from the refs that match the middle threshold 
       matchGroup <- refWorks %>% 
         filter( CR %like% 
                   substr(currentCorrectedCR,
@@ -127,17 +105,10 @@ autoMatch <- function(refWorks,threshold=.80) {
         # pull the parent out of the reference group
         matchGroup <- matchGroup[matchGroup$CR!=correctCR,]
         
-        # and keep count of all child matches
-        count <- count + nrow(matchGroup)
-        
         refWorks[refWorks$CR %in% matchGroup$CR,]$correctedCR <- correctCR
-        #refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected <- paste(refWorks[refWorks$CR %in% matchGroup$CR,]$whatCorrected,"auto-match group",correctCR)
       }
     } 
-    bar <- bar + 1
   }
-  print(paste("Found",count,"additional like text matches."))
-  
   
   return( refWorks )
 }
