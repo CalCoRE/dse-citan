@@ -279,6 +279,9 @@ refBrokers$vertex <- paste0(
 refBrokers$vertex[refBrokers$vertex=="demchenko y 2016"] <- "demchenko y 2016-1"
 refBrokers$vertex[refBrokers$vertex=="anderson p 2014-1"] <- "anderson p 2014"
 
+##### TODO: there are still some shortnames that don't map in the latter 30
+## look into this.
+
 relevantRefs <- refWorks %>% 
   filter(shortname %in% refBrokers$vertex) %>% 
   filter(freqCit > inclusion.cite.count) %>% 
@@ -286,7 +289,7 @@ relevantRefs <- refWorks %>%
 
 datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(8,10)],
   rownames=FALSE,
-  options=list(pageLength=5, class='compact stripe')
+  options=list(pageLength=10, class='compact stripe')
 )
 ```
 
@@ -365,7 +368,7 @@ One community is comprised of works that speak to curriculum development and str
 
 datatable(getClusterHub(1)[c(3,5)],
   rownames=FALSE,
-  options=list(pageLength=5, class='compact stripe')
+  options=list(pageLength=10, class='compact stripe')
 )
 ```
 
@@ -385,7 +388,7 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-datatable(coreCitingWorks1[c(5,4,6)],
+datatable(coreCitingWorks1[c(4,6,5)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -400,7 +403,7 @@ The second community is comprised of paper that focus on introducing data litera
 
 datatable(getClusterHub(2)[c(3,5)],
   rownames=FALSE,
-  options=list(pageLength=5, class='compact stripe')
+  options=list(pageLength=10, class='compact stripe')
 )
 ```
 
@@ -418,7 +421,7 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-datatable(coreCitingWorks2[c(5,4,6)],
+datatable(coreCitingWorks2[c(4,6,5)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -433,7 +436,7 @@ The third community is comprised of researchers who are focused on introducing d
 
 datatable(getClusterHub(3)[c(3,5)],
   rownames=FALSE,
-  options=list(pageLength=5, class='compact stripe')
+  options=list(pageLength=10, class='compact stripe')
 )
 ```
 
@@ -451,7 +454,7 @@ In terms of pedagogy and methodology,
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-datatable(coreCitingWorks3[c(5,4,6)],
+datatable(coreCitingWorks3[c(4,6,5)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -460,6 +463,27 @@ datatable(coreCitingWorks3[c(5,4,6)],
 ### 4.4 Works that Cite Across Communities
 
 Finally, to better understand the relationship between the reference co-citation network itself and the core Data Science Education literature, I present a deeper analysis of *how* core DSE works draw from these different clusters of literature. I present an analysis of recently published Data Science Education papers that draw heavily from While the reference co-citation network represents the scholarly foundations of what currently constitutes the "Data Science Education" literature, many of the works in this network predate the emergence of the field, and many deal with proximally or even more distally related topics (e.g. Statistics Education, Learning Theory, Education Research Methodologies).
+
+```{r}
+#| label: find-works-that-cite-all-three
+#| warning: false
+
+bridges <- coreDSEworks %>% 
+  filter( str_count(coreDSEworks$refInfo,"[1-3]") > 3 )
+  
+bridges <- bridges %>% 
+  filter( str_count(bridges$refInfo,as.character("1")) > 0 )
+
+bridges <- bridges %>% 
+  filter( str_count(bridges$refInfo,as.character("2")) > 0 )
+
+bridges <- bridges %>% 
+  filter( str_count(bridges$refInfo,as.character("3")) > 0 )
+
+bridges <- bridges %>% filter(PY > 2019)
+
+nrow(bridges)
+```
 
 ```{r}
 #| label: find-bridging-works
