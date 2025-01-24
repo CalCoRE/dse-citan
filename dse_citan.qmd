@@ -331,7 +331,7 @@ getClusterHub <- function(i) {
   return( refWorks %>%
     filter( !is.na( shortname ) ) %>% 
     filter( shortname %in% clusterLookup ) %>%
-    filter( freqCit > 0 ) %>%
+    filter( freqCit > 2 ) %>%
     arrange( desc(freqCit) ) )
 }
 
