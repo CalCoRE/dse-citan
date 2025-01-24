@@ -224,7 +224,9 @@ refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
                            network = "references", sep = "; ")
 ```
 
-Fig 3 features a visualization of the reference co-citation network of all papers that are cited at by at least 3 distinct core DSE works. In both representations, three distinct clusters can be identified: a green cluster to the left of both \[XXX\]
+**STOP HERE AND CHECK!** The clustering and layout algorithms used for this analysis have stochastic elements. *Very occasionally*, when you run this, things will shake out such that the colors and clusters I reference in the text in a "hard coded" way below are mixed up. This doc is written with the assumption that you got the likely result, where the cluster with the largest nodes is be red, and the cluster that is spatially the most uniform is green. You may want to double check and see if this is your arrangement. If not, congratulations! You are lucky. If you'd like, take an extra moment to confirm that even with this less likely result, the general nature and constitution of the clusters are the same (though their outputs may be swapped from what is expected in Sections 4.1, 4.2, and 4.3 below). For readability, re-running the chunk above and dependencies below will fix things so the text matches the output.
+
+Fig 3 features a visualization of the reference co-citation network of all papers that are cited at by at least 3 distinct core DSE works. In both representations, three distinct clusters can be identified.
 
 ```{r}
 #| label: visualize-ref-net
