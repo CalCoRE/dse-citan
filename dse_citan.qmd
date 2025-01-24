@@ -1,6 +1,6 @@
 ---
-title: "dse-citan"
-author: "removed for review"
+title: "Mapping the Conceptual Foundation(s) of \"Data Science Education\""
+author: "Michelle Hoda Wilkerson"
 format: 
   html:
     toc: true
@@ -12,8 +12,6 @@ editor: visual
 bibliography: references.bib
 csl: apa.csl
 ---
-
-# The Many Worlds of "Data Science Education"
 
 As readers of HDSR know well, there is wide diversity in who is involved in data science education research and how it is conceptualized (Data Science Education, n.d.). Navigating this landscape can be challenging, especially for those who are just entering the field or who seek complementary insights from other related domains. Different academic communities may use different terminology, or they may hold different conceptualizations for the same key terms, "talking past" one another. Publication practices and norms also differ across fields, making it harder for researchers to find relevant work. Meanwhile, there are still only a few venues (including the Harvard Data Science Review, the Journal of Statistics and Data Science Education, Teaching Statistics) that specifically advertise data science education as an area of focus (Hazzan & Mike, 2021).
 
@@ -256,7 +254,7 @@ coreDSEworks <- coreShortNames(coreDSEworks,refWorks)
 ```
 
 ::: callout-note
-**STOP HERE AND CHECK!** The clustering and layout algorithms used for this analysis have stochastic elements. *Very occasionally*, when you run this, things will shake out such that the colors and clusters I reference in the text in a "hard coded" way below are mixed up. This doc is written with the assumption that you got the likely result, where the cluster with the largest nodes is be red, and the cluster that is spatially the most uniform is green. You may want to double check and see if this is your arrangement. If not, congratulations! You are lucky. If you'd like, take an extra moment to confirm that even with this less likely result, the general nature and constitution of the clusters are the same (though their outputs may be swapped from what is expected in Sections 4.1, 4.2, and 4.3 below). For readability, re-running the chunk above and dependencies below will fix things so the text matches the output.
+**STOP HERE AND CHECK!** The clustering and layout algorithms used for this analysis have stochastic elements. *Very occasionally*, when you run this, things will shake out such that the colors and clusters I reference in the text in a "hard coded" way below are mixed up. This doc is written with the assumption that you got the likely result, where the cluster with the largest nodes is red, and the cluster that is spatially the most uniform is green. You may want to double check and see if this is your arrangement. If not, congratulations! You are lucky. If you'd like, take an extra moment to confirm that even with this less likely result, the general nature and constitution of the clusters are the same (though their outputs may be swapped from what is expected in Sections 4.1, 4.2, and 4.3 below). For readability, re-running the chunk above and dependencies below will fix things so the text matches the output.
 :::
 
 It is important to note that the network layout and clustering algorithms used in this work include stochastic elements, and your results may vary when re-running the code or examining the interactive Quarto doc. For example, the position of certain nodes in the network may change, and the centrality measures and cluster memberships of certain works at the boundaries between literatures also change. However, the emergence of these clusters and their thematic foci is highly robust to different configurations and runs of the code. My analysis below takes steps to reduce uncertainty by separating broker works from core cluster membership, and by focusing on general trends rather than relying on specific papers whenever possible when making claims about the nature and constitution of clusters.
@@ -491,7 +489,6 @@ datatable(coreCitingWorks3[c(4,6,5)],
 Finally, I searched the coreDSEworks dataset for examples of records whose reference lists feature a balance of references across all three of the clusters identified above (including broker works). However, this proved difficult for multiple reasons. Only approximately 15 of the 288 coreDSEworks included *any* references from each of the three clusters identified in this analysis.
 
 ```{r}
-{r}
 #| label: find-works-that-cite-all-three
 #| warning: false
 
