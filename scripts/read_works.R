@@ -27,5 +27,26 @@ getCoreDSEWorks <- function(scopusPath="./data/scopus.csv",
   
   coreDSEworks$CR <- coreDSEworks$CR_raw #for new data format
   
+  #extract only the first author
+  coreDSEworks$FA <- vapply(strsplit(coreDSEworks$AU,";"), 
+                            `[`, 1, FUN.VALUE=character(1)) 
+  
+  #paste together in a format that mimics the refWorks collection
+  coreDSEworks$CF <- paste( gsub(";", " ", coreDSEworks$AU),
+                            coreDSEworks$TI, 
+                            coreDSEworks$SO, 
+                            ifelse(is.na(coreDSEworks$VL), "", coreDSEworks$VL),
+                            ifelse(is.na(coreDSEworks$IS), "", coreDSEworks$IS),
+                            ifelse(is.na(coreDSEworks$Page.start), "", 
+                                   paste0( "PP ", coreDSEworks$Page.start, 
+                                           "-", coreDSEworks$Page.end)),
+                            coreDSEworks$PY )
+  
+  #strip the long whitespaces
+  coreDSEworks$CF <- gsub("\\s+", " ", coreDSEworks$CF)
+  
+  #strip the special chars
+  coreDSEworks$CF <- gsub('[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]', "", coreDSEworks$CF)
+  
   return(coreDSEworks)
 }
