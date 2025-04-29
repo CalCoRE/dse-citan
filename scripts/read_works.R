@@ -25,14 +25,27 @@ getCoreDSEWorks <- function(scopusPath="./data/scopus.csv",
   
   message("There are currently ", count(coreDSEworks), " records in coreDSEworks.")
   
+  coreDSEworks <- formatForTables(coreDSEworks)
+  
+  return(coreDSEworks)
+}
+
+formatForTables <- function(coreDSEworks) {
   coreDSEworks$CR <- coreDSEworks$CR_raw #for new data format
   
   #extract only the first author
   coreDSEworks$FA <- vapply(strsplit(coreDSEworks$AU,";"), 
                             `[`, 1, FUN.VALUE=character(1)) 
   
+  #replace blanks with NA in relevant cols
+  coreDSEworks$Page.start <- ifelse(coreDSEworks$Page.start=="",NA,coreDSEworks$Page.start)
+  coreDSEworks$VL <- ifelse(coreDSEworks$VL=="",NA,coreDSEworks$VL)
+  coreDSEworks$IS <- ifelse(coreDSEworks$IS=="",NA,coreDSEworks$IS)
+  
+  coreDSEworks$AU <- gsub(";", ", ", coreDSEworks$AU)
+  
   #paste together in a format that mimics the refWorks collection
-  coreDSEworks$CF <- paste( gsub(";", " ", coreDSEworks$AU),
+  coreDSEworks$CF <- paste( coreDSEworks$AU,
                             coreDSEworks$TI, 
                             coreDSEworks$SO, 
                             ifelse(is.na(coreDSEworks$VL), "", coreDSEworks$VL),
