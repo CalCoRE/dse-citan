@@ -1,0 +1,257 @@
+---
+title: "Robustness Checks Supplement"
+author: "Michelle Hoda Wilkerson"
+format: 
+  html:
+    toc: true
+    code-fold: true
+    code-summary: "Show the code"
+    embed-resources: true
+    css: "style.css"
+editor: visual
+bibliography: references.bib
+csl: apa.csl
+theme: minty
+---
+
+# Purpose
+
+This is a supplemental document that demonstrates the robustness of findings reported in the article Mapping the Conceptual Foundation(s) of Data Science Education. That article uses network analytic and cluster methods to determine community membership of works that are frequently cited by the "data science education" literature. Since those methods include stochastic elements, it is important to establish that the reported findings aren't just a fluke.
+
+# Setup
+
+The block below loads a cached version of the dataset used to construct the network in the article. (Processing that dataset can take some time, so this is the preferred option unless you'd like to confirm the validity of the cached data or update the dataset to use more recent bibliographic records.)
+
+```{r}
+#| label: load-clean-coreDSEworks
+
+coreDSEworks <- read.csv("data/coreDSEworks_cache514")
+```
+
+To update or re-process the dataset from raw bibliographic records, uncomment and run the code below. This code reproduces only the necessary processing steps to construct the cleaned dataset called "coreDSEworks," which is used to construct the network.
+
+```{r}
+#| label: clean-coreDSEworks-from-scratch
+#| warning: false
+
+# # load libraries
+# library(bibliometrix)
+# library(dplyr)
+# library(stringr)
+# library(textTools)
+# 
+# # get the original coreDSEworks
+# source("scripts/read_works.R")
+# coreDSEworks <- getCoreDSEWorks()
+# 
+# # get citation lists from the works
+# refWorks <- as.data.frame(
+#   citations(coreDSEworks, field = "article", sep = ";")$Cited)
+# 
+# # create a lookup table to map matching references
+# source("scripts/clean_refs.R")
+# charExcludeList <- '[\r\n\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*\\’]'
+# refWorks$CR <- gsub(charExcludeList,'',refWorks$CR) # the original cited works
+# refWorks$correctedCR <- ""
+# refWorks$freqAgg <- refWorks$Freq
+# refWorks <- cleanSpecialChars(refWorks) 
+# refWorks <- cleanManualDuplicates(refWorks) 
+# refWorks <- autoMatch(refWorks,.75)
+# 
+# # replace reference lists with clean lists where duplicate refs are matched
+# coreDSEworks <- rewriteCleanRefs(coreDSEworks,charExcludeList)
+```
+
+Finally, we create a co-citation matrix from whichever version of the the cleaned coreDSEworks you are using.
+
+```{r}
+refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
+                           network = "references", sep = "; ", short=TRUE)
+```
+
+# Robustness checks
+
+Now that we've loaded the coreDSEworks that are used in the analysis, let's see how robust these stochastic methods are in yielding the results we focus on in the paper when run repeatedly. I specifically seek to examine the questions:
+
+1.  Are my findings an isolated artifactof a *specific run* of the clustering algorithm and number of nodes specified for constructing the network that is reported in the article?
+
+2.  Are my findings an isolated artifact of the *specific clustering algorithm* used?
+
+3.  Are my findings an isolated artifact of the *number of nodes* specified for constructing the network?
+
+To examine these questions, below I execute multiple runs of three specific clustering algorithms identified in [@held2022] as commonly used in bibliometric analysis (Louvain, Leiden, and Walktrap). My goal is to establish that the findings I report emerge relatively consistently across a variety of reasonable ways to set up the analysis of bibliographic records, and are therefore not merely computational artifacts.
+
+## Robustness Across Runs of the Same Setup
+
+First, let's examine the representativeness of the reported findings across multiple runs of the same algorithm used in the paper (Leiden), across the same setup conditions (only references with 3 or more citations are included in the network).
+
+```{r}
+
+# make an array of refNets to compare
+clusterCount <- array(20)
+clusterMembership <- array(20)
+
+# repeat 20 times
+for( i in 1:20 ) {
+  inclusion.cite.count = 2
+  cutoff = as.integer(count(refWorks %>% 
+                              filter(freqCit>inclusion.cite.count)))
+  
+  # store the networks
+  refNet=networkPlot(refMatrix, n=cutoff,
+                     Title = "Co-Citation Network of Top DSE Reference Works",
+                     size.cex=TRUE, size=15, remove.multiple=FALSE,
+                     remove.isolates = TRUE, labelsize=0, edgesize = 5,
+                     edges.min=0, type = "fruchterman", cluster = "leiden",
+                     community.repulsion = .04)
+  
+  # store the cluster count for comparison
+  clusterCount[i] <- refNet$cluster_obj$nb_clusters
+  
+  # store the cluster memberships for comparison
+  refNet$cluster_res$pasted <- paste( refNet$cluster_res['vertex'], refNet$cluster_res['cluster'] )
+  clusterMembership[i] <- refNet$cluster_res$pasted 
+}
+```
+
+First, let's check the stability of the cluster *count*:
+
+```{r}
+
+paste("The percent of networks with 3 clusters is: ", sum(clusterCount==3)/length(clusterCount))
+```
+
+Now, let's check the stability of the cluster *membership*:
+
+### 6.1 Louvain
+
+Louvain is the default clustering algorithm used to identify community membership in networks.
+
+```{r}
+
+for( i in 1:5 ) {
+  for( citeCount in 3:5 ) {
+    cutoff = as.integer(count(refWorks %>% 
+                                filter(freqCit>=citeCount)))
+    refNet=networkPlot(refMatrix, n=cutoff,
+                       Title = "Co-Citation Network of Top DSE Reference Works",
+                       size.cex=TRUE, size=15, remove.multiple=FALSE,
+                       remove.isolates = TRUE, labelsize=0, edgesize = 5,
+                       edges.min=0, type = "fruchterman", cluster = "louvain",
+                       community.repulsion = .04)
+  }
+}
+```
+
+### 6.2 Leiden
+
+Leiden has been proposed as
+
+```{r}
+
+for( i in 1:5 ) {
+  for( citeCount in 3:5 ) {
+    cutoff = as.integer(count(refWorks %>% 
+                                filter(freqCit>=citeCount)))
+    refNet=networkPlot(refMatrix, n=cutoff,
+                       Title = paste("Leiden with at least",citeCount,"citations, trial",i),
+                       size.cex=TRUE, size=15, remove.multiple=FALSE,
+                       remove.isolates = TRUE, labelsize=0, edgesize = 5,
+                       edges.min=0, type = "fruchterman", cluster = "leiden",
+                       community.repulsion = .04)
+  }
+}
+```
+
+### 6.3 Walktrap
+
+```{r}
+
+for( i in 1:5 ) {
+  for( citeCount in 3:5 ) {
+    cutoff = as.integer(count(refWorks %>% 
+                                filter(freqCit>=citeCount)))
+    refNet=networkPlot(refMatrix, n=cutoff,
+                       Title = "Co-Citation Network of Top DSE Reference Works",
+                       size.cex=TRUE, size=15, remove.multiple=FALSE,
+                       remove.isolates = TRUE, labelsize=0, edgesize = 5,
+                       edges.min=0, type = "fruchterman", cluster = "walktrap",
+                       community.repulsion = .04)
+  }
+}
+```
+
+## 6.4 Cluster Membership at Cutoff 3
+
+```{r}
+
+cutoff = as.integer(count(refWorks %>% 
+                            filter(freqCit>3)))
+
+#make a dataframe to hold all the runs
+clusterTest <- data.frame(matrix(ncol=4,nrow=0))
+clusterTest <- rbind(clusterTest,list(99,99,99,99))
+colnames(clusterTest) <- c("cluster", "clusterType", "run", "membership")
+
+
+trials = 10
+clusterTypes = list("leiden", "louvain", "walktrap")
+#pass the ref matrix
+
+for(clusterType in clusterTypes) {
+  for(trial in 1:trials) {
+    thisTrial <- networkPlot(refMatrix, n=cutoff,
+                     Title = paste(clusterType,"Trial",trial),
+                     remove.isolates = TRUE, cluster = clusterType)
+    
+    thisTrialClusterAuthors <- thisTrial[["cluster_res"]] %>%
+    # restrict this to only authors of papers that are not very connected
+    # outside of their specific cluster
+    filter( btw_centrality < btw_cutoff ) %>%
+    group_by(cluster) %>%
+    summarize(authors = list(
+      paste(
+        word(vertex,1),  # first word (last name)
+        str_sub(word(vertex,2),1,1),     # second word (first initial)
+        word(vertex,3) )
+      )
+    )
+    
+    for( cluster in unique( thisTrial$cluster_obj$membership ) ) {
+      clusterTest <- rbind(clusterTest,list(cluster,
+                                            clusterType,
+                                            trial,
+                                            list(thisTrialClusterAuthors$authors[[cluster]])))
+    }
+  }
+}
+```
+
+Now, compute matches.
+
+```{r}
+
+net <- buildRepSeqNetwork(toy_data, "CloneSeq", 
+                          print_plots = FALSE, 
+                          cluster_stats = TRUE, 
+                          cluster_id_name = "cluster_greedy"
+)
+```
+
+## 6.5 Summary Table
+
++---------------------------------------------------+--------+---------+----------+---------+
+|                                                   | Leiden | Louvain | Walktrap | Optimal |
++===================================================+========+=========+==========+=========+
+| 2 (329 records)                                   |        |         |          |         |
++---------------------------------------------------+--------+---------+----------+---------+
+| 3 (205 records)                                   |        |         |          |         |
++---------------------------------------------------+--------+---------+----------+---------+
+| 4 (138 records)                                   |        |         |          |         |
++---------------------------------------------------+--------+---------+----------+---------+
+| \% overlap at 3, each cluster meaned over 10 runs |        |         |          |         |
+|                                                   |        |         |          |         |
+| (n=10)                                            |        |         |          |         |
++---------------------------------------------------+--------+---------+----------+---------+
+
+Against the reported results using Leiden 3
