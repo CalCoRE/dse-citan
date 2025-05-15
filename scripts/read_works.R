@@ -61,5 +61,8 @@ formatForTables <- function(coreDSEworks) {
   #strip the special chars
   coreDSEworks$CF <- gsub('[\\:\\(\\)+\\?\\|\\"\\“\\”\\,\'\\`\\‘\\.\\*]', "", coreDSEworks$CF)
   
+  #pull only the first author for consistent reference display
+  coreDSEworks$FA <- str_split_i(coreDSEworks$AU, ",", 1 )
+  
   return(coreDSEworks)
 }
