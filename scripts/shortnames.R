@@ -8,14 +8,18 @@ refShortNames <- function(refWorks,n=1) {
   # note only first initial
   
   # make a shortname "last first yyyy"
-  shortname <- tolower(paste0(
+  
+  author <- tolower(paste0(
     word(refWorks$correctedCR), # first word (last name)
     " ",  
-    substr(word(refWorks$correctedCR,2),0,1), #second word (first initial)
-    " ",
-    str_extract(refWorks$correctedCR,regex("\\b(19|20)\\d{2}\\b")) #year
-  ))
+    substr(word(refWorks$correctedCR,2),0,1)))
+    
+  year <- tolower(str_extract(refWorks$correctedCR,regex("\\b(19|20)\\d{2}\\b")))
   
+  shortname <- paste(author,year)
+  
+  refWorks$firstAuthor <- toupper(author)
+  refWorks$year <- year
   # get commas out
   refWorks$shortname <- gsub(',','',shortname)
   
@@ -30,8 +34,7 @@ refShortNames <- function(refWorks,n=1) {
       filter(shortname %in% parentRefShortnames$shortname[i] ) %>%
       arrange(desc(freqCit))
     
-    # if there's more than one record, append numbers to identify each
-    # the most popular is appended -1
+    # if there's more than one record, append numbers to less popular duplicates
     if( count( records ) > n ) {
       # Uncomment the line below to print shortnames that need appending.
       # This can be useful for identifying duplicate records.
@@ -47,7 +50,8 @@ refShortNames <- function(refWorks,n=1) {
         # if there are more than two records, let us know the name to check
         # for dupes
         refWorks[refWorks$CR==ref,]$shortname <- paste0(
-          refWorks[refWorks$CR==ref,]$shortname, "-", append )
+          refWorks[refWorks$CR==ref,]$shortname, 
+          ifelse(append > 1, paste0("-", append ), ""))
 
         append <- append + 1
         
