@@ -103,7 +103,11 @@ While the focus of this paper is not on the core works themselves, it is useful 
 ```{r}
 #| label: show-pub-years
 
-hist(coreDSEworks$PY)
+# use breaks to make sure empty bins (2013) still show
+hist(coreDSEworks$PY, breaks=seq(2011,2025,1), xaxt='n')
+
+# shuffle the axis to place each year in center of the corresponding bar
+axis(side=1, at=seq(2011.5,2024.5, 1), labels=seq(2012,2025,1))
 ```
 
 A review of the identified documents similarly confirms that this is a reasonable set of publications to begin with. Table 1 below previews five randomly selected records from the `coreDSEworks` dataset. As intended, the set of works appears to be conservatively chosen to include only research that is explicitly focused on “data science education.” In other words, while there may be some expected works missing from the set, the `coreDSEworks` set does reasonably represent a core set of scholarly papers that all center the study and practice of data science education.is.na(myTest)
