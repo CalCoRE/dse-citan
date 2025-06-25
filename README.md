@@ -1,7 +1,8 @@
 This is the code, data, and a quarto-generated interactive html doc 
-to accompany a reference co-citation analysis report focused on data 
-science education that is currently under review.
+to accompany the paper: 
+
+Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of Data Science Education. To appear in _Harvard Data Science Review_.
 
 The bibliographic records were last updated on Dec 9, 2024.
 
-To view the interactive, visit https://calcore.github.io/dse-citan/dse_citan.html.
+To view an interactive html version of this analysis, [click here](https://calcore.github.io/dse-citan/dse_citan.html).
