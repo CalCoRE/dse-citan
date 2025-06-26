@@ -391,7 +391,6 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
   
   return( coreCitingWorks )
 }
-
 ```
 
 ## 4.1 Data Science Undergraduate Major Programs
