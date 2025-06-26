@@ -309,10 +309,8 @@ refBrokers$vertex <- paste0(
   str_sub(word(refBrokers$vertex,2),1,1), " ",
   word(refBrokers$vertex,3))
 
-# refNet is shortnaming most popular with -1; manually fix for the join
-refBrokers$vertex[refBrokers$vertex=="anderson p 2014-1"] <- "anderson p 2014"
-refBrokers$vertex[refBrokers$vertex=="data s 2018-1"] <- "data s 2018"
-refBrokers$vertex[refBrokers$vertex=="wickham h 2016-1"] <- "wickham h 2016"
+# refNet is shortnaming most popular with -1; fix for the join
+refBrokers$vertex <- sub("(\\d{4})-1","\\1",refBrokers$vertex)
 
 ##### TODO: there are still some shortnames that don't map in the latter 30
 ## look into this.
