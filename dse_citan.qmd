@@ -122,6 +122,7 @@ A review of the identified documents similarly confirms that this is a reasonabl
 datatable(coreDSEworks[
   sample(1:nrow(coreDSEworks)), 
   c(1,5,4,6)],
+  colnames=c('Author','Year','Title', 'Source'),
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -152,6 +153,7 @@ These difficulties are most likely to arise for higher-profile papers that have 
 showabit <- refWorks %>% filter( CR %like% "DATA SCIENCE FOR UNDERGRADUATES" ) %>% head(20)
 datatable(showabit,
   rownames=FALSE,
+  colnames=c('Cited Reference','Freq'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
@@ -197,6 +199,7 @@ After this round of cleaning, the citation frequency of more popular reference w
 datatable(refWorks[c(3,5)] %>% 
             arrange(desc(refWorks$freqCit)) %>% 
             head(100),
+  colnames=c('Cited Reference','# Citing DSE Works'),
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -225,6 +228,7 @@ biehler <- refWorks %>% filter(shortname %like% "biehler r 2018")
 datatable(biehler[c(1,5,8)] %>%
             filter(freqCit > 0) %>%
             arrange(desc(freqCit)),
+  colnames=c('Cited Reference','# Citing DSE Works','Shortname'),
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -320,6 +324,7 @@ relevantRefs <- refWorks %>%
 
 datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(11,12,8,10)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -402,6 +407,7 @@ The red nodes visualized in Figure 3 represent the most prominent of the three c
 
 datatable(getClusterHub(1)[c(6,7,3,5)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -440,6 +446,7 @@ A second cluster of foundational literature, represented by blue nodes in Figure
 
 datatable(getClusterHub(3)[c(6,7,3,5)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -464,6 +471,7 @@ coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
 datatable(coreCitingWorks3[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
@@ -477,6 +485,7 @@ A third cluster consists of work, represented by green nodes in Figure 3, that d
 
 datatable(getClusterHub(2)[c(6,7,3,5)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -503,6 +512,7 @@ coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
 datatable(coreCitingWorks2[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
@@ -531,6 +541,7 @@ bridges <- bridges %>% filter(PY > 2019)
 
 datatable(bridges[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(class='compact stripe')
 )
 ```
@@ -560,6 +571,7 @@ bridges <- bridges %>% filter(PY > 2019)
 
 datatable(bridges[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(class='compact stripe')
 )
 ```
