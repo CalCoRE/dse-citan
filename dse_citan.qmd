@@ -426,6 +426,7 @@ coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
 datatable(coreCitingWorks1[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
@@ -500,7 +501,7 @@ Recent citing works of cluster 3, like the reference cluster isolate itself, app
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-datatable(coreCitingWorks2[c(93,5,94,13)],
+datatable(coreCitingWorks2[c(93,5,94)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
