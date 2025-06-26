@@ -424,7 +424,7 @@ Using the shortname identifiers, we can perform a co-citation coupling analysis 
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-datatable(coreCitingWorks1[c(93,5,94,13)],
+datatable(coreCitingWorks1[c(93,5,94)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -461,7 +461,7 @@ Recent coreDSEworks that heavily cite papers from the K-12 Education and Learnin
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-datatable(coreCitingWorks3[c(93,5,94,13)],
+datatable(coreCitingWorks3[c(93,5,94)],
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -528,7 +528,7 @@ bridges <- bridges %>%
 
 bridges <- bridges %>% filter(PY > 2019)
 
-datatable(bridges[c(93,5,94,13)],
+datatable(bridges[c(93,5,94)],
   rownames=FALSE,
   options=list(class='compact stripe')
 )
@@ -557,7 +557,7 @@ bridges <- bridges %>%
 
 bridges <- bridges %>% filter(PY > 2019)
 
-datatable(bridges[c(93,5,94,13)],
+datatable(bridges[c(93,5,94)],
   rownames=FALSE,
   options=list(class='compact stripe')
 )
