@@ -172,8 +172,6 @@ refWorks$freqAgg <- refWorks$Freq
 refWorks <- cleanSpecialChars(refWorks) 
 refWorks <- cleanManualDuplicates(refWorks) 
 refWorks <- autoMatch(refWorks,.75)
-
-# uncomment above to update records; using a cached version below
 ```
 
 After consolidating duplicate records in this way, the total count of unique reference records falls to 7,484.
@@ -189,11 +187,6 @@ The lookup table is then used to replace all duplicate versions of a given refer
  
  # update frequencies given found matches in coreDSEworks
  refWorks <- correctFrequenciesCited(refWorks,coreDSEworks)
-
-# uncomment above to update records; using a cached version below
-
-#refWorks <- read.csv("data/refWorks_cache515")
-#refWorks$X <- NULL #remove artifact of fileread
 ```
 
 After this round of cleaning, the citation frequency of more popular reference works changes substantially. Table 3 features the top 5 records in the corrected `refWorks` dataset, ordered by frequency of citations. The *Data Science for Undergraduates* reference that was originally listed as the most frequently referenced citation at 18 shows a total of 40 references after consolidation; this reference is superseded by De Veaux et al's [-@deveaux2017] curriculum guidelines as the reference work that is most cited by the focal `coreDSEworks`.
