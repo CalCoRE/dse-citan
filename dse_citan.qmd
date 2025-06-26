@@ -469,7 +469,7 @@ datatable(coreCitingWorks3[c(93,5,94)],
 
 ## 4.3 Computational Approaches to Data for Non-Majors
 
-A third cluster consists of work, represented by green nodes in Figure 3, represents literature that describes bringing the computational tools and methods of data science to students who are non-specialists. Structurally, this cluster features fewer nodes with high betweenness measures or high citation counts as compared to the other two clusters. Members of the Computational Approaches for Data for Non-Majors cluster isolate (Table 10) emphasize computational methods including data mining, simulation, and computing enacted in science contexts.
+A third cluster consists of work, represented by green nodes in Figure 3, that describes bringing the computational tools and methods of data science to students who are non-specialists. Structurally, this cluster features fewer nodes with high betweenness measures or high citation counts as compared to the other two clusters. Members of the Computational Approaches for Data for Non-Majors cluster isolate (Table 10) emphasize computational methods including data mining, simulation, and computing enacted in science contexts.
 
 ```{r}
 #| label: see-cluster-hub-2
