@@ -1,7 +1,7 @@
 This is the code, data, and a quarto-generated interactive html doc 
 to accompany the paper: 
 
-Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of Data Science Education. To appear in _Harvard Data Science Review_.
+Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of Data Science Education. Just accepted in _Harvard Data Science Review_. [https://doi.org/10.1162/99608f92.9ac68105](https://doi.org/10.1162/99608f92.9ac68105)
 
 The bibliographic records were last updated on Dec 9, 2024.
 
