@@ -17,7 +17,7 @@ abstract: "The emerging field of data science education is broadly interdiscipli
 ---
 
 ::: callout-note
-This is an interactive version of Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of Data Science Education. Just Accepted in *Harvard Data Science Review*. <https://doi.org/10.1162/99608f92.9ac68105>
+This is a Quarto-generated html version of Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of Data Science Education. Just Accepted in *Harvard Data Science Review*. <https://doi.org/10.1162/99608f92.9ac68105>
 :::
 
 Data science sits at the intersection of many disciplines, ranging from statistics and computer science to a variety of application domains. It is not surprising, then, that there is also wide diversity in who is involved in data science *education*, and in how this emerging field is conceptualized [@datasci]. Navigating the landscape of data science education research can be challenging, especially for those who are just entering the field or who seek complementary insights from the various scholarly communities that are involved. Different academic communities may use different terminology, or they may hold different conceptualizations for the same key terms, "talking past" one another. Publication practices and norms also differ across fields, making it harder for researchers to find relevant work. Meanwhile, there are still only a few venues (including the *Harvard Data Science Review*, *Journal of Statistics and Data Science Education*, and *Teaching Statistics*) that specifically advertise data science education as an area of focus [@hazzan2021].
