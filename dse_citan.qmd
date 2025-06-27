@@ -32,7 +32,7 @@ My goal is to raise awareness of the diversity of communities working on data sc
 
 As data science education emerges as a discipline in its own right [@finzer2013; @lee2021; @mike2023; @nationalacademiesofsciencesengineeringandmedicine2018; @nationalacademiesofsciencesengineeringandmedicine2023], still little is known about its core scholarly foundations. This is not surprising, given the rapid evolution of the field of data science and the variety of academic communities that are involved in its development. In many ways, data science education is even more interdisciplinary than data science as a field. Studying the teaching and learning of data science not only involves the content that is being taught, but also requires attention to theories of learning, educational infrastructures, appropriate social science methodologies, and curricular frameworks. There are also multiple established literatures that address some important conceptual foundations of data science [e.g. statistics education, @internat2018; @nolan2010 and computing education; @thecamb2019] and of related topics [e.g. scientific visualization, @edelson1998; data literacies, @pangrazio2019].
 
-Despite these complexities, data science education research and curriculum development races ahead not only at universities but also in K-12 [@weiland2022;@nationalacademiesofsciencesengineeringandmedicine2023], at community colleges [@baumer2023], and in the professional development of teachers [@hudson2024]. It is important to understand how different research communities are approaching data science education, what these communities might learn from each other and from their histories of scholarship, and what this all might mean for the different types of "data science education" students might experience across levels and institutions.
+Despite these complexities, data science education research and curriculum development races ahead not only at universities but also in K-12 [@weiland2022; @nationalacademiesofsciencesengineeringandmedicine2023], at community colleges [@baumer2023], and in the professional development of teachers [@hudson2024]. It is important to understand how different research communities are approaching data science education, what these communities might learn from each other and from their histories of scholarship, and what this all might mean for the different types of "data science education" students might experience across levels and institutions.
 
 ## 1.1 Data Science Education as an Interdisciplinary Field
 
@@ -124,6 +124,7 @@ A review of the identified documents similarly confirms that this is a reasonabl
 datatable(coreDSEworks[
   sample(1:nrow(coreDSEworks)), 
   c(1,5,4,6)],
+  colnames=c('Author','Year','Title', 'Source'),
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -154,6 +155,7 @@ These difficulties are most likely to arise for higher-profile papers that have 
 showabit <- refWorks %>% filter( CR %like% "DATA SCIENCE FOR UNDERGRADUATES" ) %>% head(20)
 datatable(showabit,
   rownames=FALSE,
+  colnames=c('Cited Reference','Freq'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
@@ -174,8 +176,6 @@ refWorks$freqAgg <- refWorks$Freq
 refWorks <- cleanSpecialChars(refWorks) 
 refWorks <- cleanManualDuplicates(refWorks) 
 refWorks <- autoMatch(refWorks,.75)
-
-# uncomment above to update records; using a cached version below
 ```
 
 After consolidating duplicate records in this way, the total count of unique reference records falls to 7,484.
@@ -191,11 +191,6 @@ The lookup table is then used to replace all duplicate versions of a given refer
  
  # update frequencies given found matches in coreDSEworks
  refWorks <- correctFrequenciesCited(refWorks,coreDSEworks)
-
-# uncomment above to update records; using a cached version below
-
-#refWorks <- read.csv("data/refWorks_cache515")
-#refWorks$X <- NULL #remove artifact of fileread
 ```
 
 After this round of cleaning, the citation frequency of more popular reference works changes substantially. Table 3 features the top 5 records in the corrected `refWorks` dataset, ordered by frequency of citations. The *Data Science for Undergraduates* reference that was originally listed as the most frequently referenced citation at 18 shows a total of 40 references after consolidation; this reference is superseded by De Veaux et al's [-@deveaux2017] curriculum guidelines as the reference work that is most cited by the focal `coreDSEworks`.
@@ -206,6 +201,7 @@ After this round of cleaning, the citation frequency of more popular reference w
 datatable(refWorks[c(3,5)] %>% 
             arrange(desc(refWorks$freqCit)) %>% 
             head(100),
+  colnames=c('Cited Reference','# Citing DSE Works'),
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -234,6 +230,7 @@ biehler <- refWorks %>% filter(shortname %like% "biehler r 2018")
 datatable(biehler[c(1,5,8)] %>%
             filter(freqCit > 0) %>%
             arrange(desc(freqCit)),
+  colnames=c('Cited Reference','# Citing DSE Works','Shortname'),
   rownames=FALSE,
   options=list(pageLength=5, class='compact stripe')
 )
@@ -314,10 +311,8 @@ refBrokers$vertex <- paste0(
   str_sub(word(refBrokers$vertex,2),1,1), " ",
   word(refBrokers$vertex,3))
 
-# refNet is shortnaming most popular with -1; manually fix for the join
-refBrokers$vertex[refBrokers$vertex=="anderson p 2014-1"] <- "anderson p 2014"
-refBrokers$vertex[refBrokers$vertex=="data s 2018-1"] <- "data s 2018"
-refBrokers$vertex[refBrokers$vertex=="wickham h 2016-1"] <- "wickham h 2016"
+# refNet is shortnaming most popular with -1; fix for the join
+refBrokers$vertex <- sub("(\\d{4})-1","\\1",refBrokers$vertex)
 
 ##### TODO: there are still some shortnames that don't map in the latter 30
 ## look into this.
@@ -329,6 +324,7 @@ relevantRefs <- refWorks %>%
 
 datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(11,12,8,10)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -400,7 +396,6 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
   
   return( coreCitingWorks )
 }
-
 ```
 
 ## 4.1 Data Science Undergraduate Major Programs
@@ -412,6 +407,7 @@ The red nodes visualized in Figure 3 represent the most prominent of the three c
 
 datatable(getClusterHub(1)[c(6,7,3,5)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -434,8 +430,9 @@ Using the shortname identifiers, we can perform a co-citation coupling analysis 
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-datatable(coreCitingWorks1[c(93,5,94,13)],
+datatable(coreCitingWorks1[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
@@ -449,6 +446,7 @@ A second cluster of foundational literature, represented by blue nodes in Figure
 
 datatable(getClusterHub(3)[c(6,7,3,5)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -471,21 +469,23 @@ Recent coreDSEworks that heavily cite papers from the K-12 Education and Learnin
 
 coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-datatable(coreCitingWorks3[c(93,5,94,13)],
+datatable(coreCitingWorks3[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
 
 ## 4.3 Computational Approaches to Data for Non-Majors
 
-A third cluster consists of work, represented by green nodes in Figure 3, represents literature that describes bringing the computational tools and methods of data science to students who are non-specialists. Structurally, this cluster features fewer nodes with high betweenness measures or high citation counts as compared to the other two clusters. Members of the Computational Approaches for Data for Non-Majors cluster isolate (Table 10) emphasize computational methods including data mining, simulation, and computing enacted in science contexts.
+A third cluster consists of work, represented by green nodes in Figure 3, that describes bringing the computational tools and methods of data science to students who are non-specialists. Structurally, this cluster features fewer nodes with high betweenness measures or high citation counts as compared to the other two clusters. Members of the Computational Approaches for Data for Non-Majors cluster isolate (Table 10) emphasize computational methods including data mining, simulation, and computing enacted in science contexts.
 
 ```{r}
 #| label: see-cluster-hub-2
 
 datatable(getClusterHub(2)[c(6,7,3,5)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
   options=list(pageLength=10, class='compact stripe')
 )
 ```
@@ -510,8 +510,9 @@ Recent citing works of cluster 3, like the reference cluster isolate itself, app
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-datatable(coreCitingWorks2[c(93,5,94,13)],
+datatable(coreCitingWorks2[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
@@ -538,8 +539,9 @@ bridges <- bridges %>%
 
 bridges <- bridges %>% filter(PY > 2019)
 
-datatable(bridges[c(93,5,94,13)],
+datatable(bridges[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(class='compact stripe')
 )
 ```
@@ -567,8 +569,9 @@ bridges <- bridges %>%
 
 bridges <- bridges %>% filter(PY > 2019)
 
-datatable(bridges[c(93,5,94,13)],
+datatable(bridges[c(93,5,94)],
   rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
   options=list(class='compact stripe')
 )
 ```
