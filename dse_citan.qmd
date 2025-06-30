@@ -314,8 +314,7 @@ refBrokers$vertex <- paste0(
 # refNet is shortnaming most popular with -1; fix for the join
 refBrokers$vertex <- sub("(\\d{4})-1","\\1",refBrokers$vertex)
 
-##### TODO: there are still some shortnames that don't map in the latter 30
-## look into this.
+##### TODO: what is going on with dalton c 2016? shortnames seem to match fine
 
 relevantRefs <- refWorks %>% 
   filter(shortname %in% refBrokers$vertex) %>% 
