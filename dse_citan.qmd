@@ -150,13 +150,13 @@ These difficulties are most likely to arise for higher-profile papers that have 
 
 ```{r}
 #| label: demo-duplicates
-#| output: false
+#| output: true
 
 showabit <- refWorks %>% filter( CR %like% "DATA SCIENCE FOR UNDERGRADUATES" ) %>% head(20)
 datatable(showabit,
   rownames=FALSE,
   colnames=c('Cited Reference','Freq'),
-  options=list(pageLength=5, class='compact stripe')
+  options=list(pageLength=12, class='compact stripe')
 )
 ```
 
