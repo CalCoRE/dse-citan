@@ -13,20 +13,24 @@ bibliography: references.bib
 csl: apa.csl
 theme: minty
 
-abstract: "The emerging field of data science education is broadly interdisciplinary, and related literature is distributed across a variety of outlets. Navigating this landscape can be challenging, especially for those who are just entering the field or who seek insights from multiple fields. This report contributes to a growing body of research that aims to characterize the emerging field of \"Data Science Education.\" It presents a reference co-citation analysis drawing from 7,000+ works that are cited by papers that explicitly identify themselves in their title, keywords, or abstract as concerned with “data science education”—thus representing the de facto foundations of this field. The structure of the resulting reference co-citation network suggests that while there are some \"broker\" references that are broadly cited across the emerging data science education literature, the field is building upon three distinctive, conceptually coherent, and rather isolated clusters of reference works. These clusters generally focus on Undergraduate Data Science programs, K-12 Data Science, and Computational Approaches to Data for Non-Majors, respectively. I characterize each cluster with attention to the audiences, themes, pedagogies, and methodologies emphasized, and explore the nature of recent data science education papers that draw heavily from each cluster. All three clusters demonstrate attention to student-centered pedagogies, research methodologies that highlight student experience, and ethics and diversity. However, they also highlight important differences in scholarly foundations between undergraduate and K-12 data science education efforts, between data science education efforts for majors versus non-majors, and between K-12 data science initiatives emerging from different groups and disciplines."
+abstract: "The emerging field of data science education is broadly interdisciplinary, and related literature is distributed across a variety of outlets. Navigating this landscape can be challenging, especially for those who are just entering the field or who seek insights from multiple fields. This document contributes to a growing body of research that aims to characterize the emerging field of \"Data Science Education.\" It presents a reference co-citation analysis drawing from works that are cited by papers that explicitly identify themselves in their title, keywords, or abstract as concerned with “data science education”—thus representing the de facto foundations of this field."
 ---
 
 ::: callout-note
-This is a Quarto-generated html version of Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of Data Science Education. Just Accepted in *Harvard Data Science Review*. <https://doi.org/10.1162/99608f92.9ac68105>
+This is a Quarto-generated, regularly updated html version of Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of Data Science Education. Just Accepted in *Harvard Data Science Review*. <https://doi.org/10.1162/99608f92.9ac68105>
+
+I will attempt to update this document to include the latest relevant publications in the bibliometric analysis roughly every 6 months. Naturally, this means findings evidenced in this document may change over time.
+
+Have fun!! I'm super open to contributions at <https://github.com/CalCoRE/dse-citan>
+
+Last update - August, 2025 by Michelle H. Wilkerson
 :::
 
 Data science sits at the intersection of many disciplines, ranging from statistics and computer science to a variety of application domains. It is not surprising, then, that there is also wide diversity in who is involved in data science *education*, and in how this emerging field is conceptualized [@datasci]. Navigating the landscape of data science education research can be challenging, especially for those who are just entering the field or who seek complementary insights from the various scholarly communities that are involved. Different academic communities may use different terminology, or they may hold different conceptualizations for the same key terms, "talking past" one another. Publication practices and norms also differ across fields, making it harder for researchers to find relevant work. Meanwhile, there are still only a few venues (including the *Harvard Data Science Review*, *Journal of Statistics and Data Science Education*, and *Teaching Statistics*) that specifically advertise data science education as an area of focus [@hazzan2021].
 
-There is growing evidence that it is time to take stock and build common understandings of data science education as a field in its own right, despite (or perhaps because of) the difficulty in navigating this interdisciplinary scholarly landscape. This report seeks to clarify the scholarly communities that are shaping this emerging field by presenting a mixed-methods investigation of 287 papers that explicitly identify themselves in their title, keywords, or abstract as concerned with “data science education,” as well as of the 7,000+ reference works that, together, form the *de facto* foundations of data science education scholarship. These reference works are extracted from the focal set of “data science education” papers to construct a co-citation network that highlights the structure of the knowledge base(s) that are informing data science education as an emerging field.
+There is growing evidence that it is time to take stock and build common understandings of data science education as a field in its own right, despite (or perhaps because of) the difficulty in navigating this interdisciplinary scholarly landscape. This document seeks to clarify the scholarly communities that are shaping this emerging field by presenting a descriptive investigation of papers that explicitly identify themselves in their title, keywords, or abstract as concerned with “data science education,” as well as a scientific mapping analysis of the co-citation patterns of reference works that, together, form the *de facto* foundations of data science education scholarship. The goal is to highlight the "living" structure of the knowledge base(s) that are informing data science education as an emerging field.
 
-Analysis of the reference co-citation network suggests that while there are several shared (but not- so-shared) "broker" references that are broadly cited within the emerging data science education literature, current data science education scholarship is built atop three distinctive and conceptually coherent, but rather isolated clusters of reference work. I characterize each cluster with attention to the audiences, themes, pedagogy, and methodologies emphasized, and explore the nature of recent data science education papers that draw from each cluster. I then examine areas of agreement and divergence across the clusters. All three clusters of literature include attention to student-centered pedagogies, case-based methodologies that highlight student experience, and ethics and diversity. However, there are notable areas of divergence, especially between undergraduate and K-12 data science education efforts, between data science majors versus non- majors, and between K-12 data science initiatives emerging from different groups.
-
-My goal is to raise awareness of the diversity of communities working on data science education, and to encourage deeper engagement with literature and researchers across these communities. In that spirit, this interactive open-source Quarto document allows readers to follow along with my methods in real time and to peruse the full lists of reference works that make up the many worlds of data science education. Understanding what we can learn from each other can support stronger, more coherent trajectories for future data science students, as well as for all students who will find themselves navigating a data-filled world.
+My goal is to raise awareness of the diversity of communities working on data science education, and to encourage deeper engagement with literature and researchers across these communities. In that spirit, this interactive open-source Quarto document allows readers to peruse the full lists of articles and reference works that make up the field(s) of data science education. Understanding what we can learn from each other can support stronger, more coherent trajectories for future data science students, as well as for all students who will find themselves navigating a data-filled world.
 
 # 1. Why Map Data Science Education Scholarship?
 
@@ -38,13 +42,7 @@ Despite these complexities, data science education research and curriculum devel
 
 The earliest programs in data science were born within a variety of departments including statistics, computer science, business analytics, information and library sciences, each with distinctive emphases and approaches. One of the clearest differences in approach to data science education approaches has been between statistics and computer science. A recent scoping review of data science education literature by Msweli and colleagues [-@msweli2023] found that most papers they identified in their search did not explicitly name data science, but rather computer science or statistics, as the home discipline of their work. A pair of workshops offered in 2019 at the ACM's Special Interest Group in Computer Science Education [@cetinkaya-rundel2019] (Cetinkaya-Rundel, Danyluk, et al., 2019) and at the Joint Statistical Meetings (Cetinkaya-Rundel, Posner, et al., 2019), respectively, highlight efforts by both communities to foster collaboration between disciplines.
 
-These distinctive approaches to data science education can also be detected in published products themselves. In a recent review, Mike and colleagues [-@mike2023] leveraged k-means clustering techniques to classify a collection of over 1,000 papers selected on the intersection of the phrase “data science” with education-related terms such as “education”, “teaching”, and “curriculum” to identify core areas of focus for this emerging field. They identified five key themes: curriculum; pedagogy; STEM skills; domain adaptation; and social aspects. While the themes were not traced to disciplinary communities of origin, there is some suggestion of domain specialization within the emergent themes suggested by the cluster analysis. For example, within a cluster called "STEM skills", two clusters (3.1 – Statistics education and 3.5 – Statistics for data science) were identified as connected to statistics, and three (3.2 – Computer science for data science; 3.3 – Cloud computing in data science education; and 3.4 – Data engineering) were identified as connected to computer science.
-
-Another consistently emphasized feature of data science as a field is its deep integration with a variety of application domains. These domain-specific programs of study were also represented in Mike et al’s [-@mike2023] study as a cluster called “Domain adaptation,” which represented fields as diverse as health (4.2, 4.7), business analytics (4.1), and bioinformatics (4.4). Given the specialized needs and methods of different application areas, it is reasonable to assume that smaller communities of research may emerge around particular application domains or related frameworks and methods.
-
-More signs of scholarly specialization emerge even within narrower focal areas of data science education research. Rosenberg and Jones [-@rosenberg2024] present vignettes illustrating substantially different visions of what constitutes "data science education" at the K-12 level. The vignettes were derived from an analysis of three recent journal special issues (a total of 28 papers and their shared references) dedicated to the topic. They found that despite their shared topical focus, each special issue reflected distinct orientations toward the field, emphasizing the material, personal, or disciplinary aspects of data science. Rosenberg and Jones highlighted the different levels of cohesiveness in what literature was cited by papers within versus across special issues, as well as a relative lack of cohesiveness in what literature was cited by scholars focused on K-12 versus undergraduate education.
-
-All this suggests that there may be relatively independently developing communities of data science education scholarship. These communities are likely attending to different themes, audiences, and approaches of the sort identified in Mike et al [-@mike2023]; and, they are likely drawing from somewhat different foundational literatures as highlighted by Rosenberg & Jones [-@rosenberg2024]. However, these prior reviews varied dramatically in scope and method, making it difficult to understand the relationship between thematic trends and different foundational literatures. One goal of this paper is to offer a "meso" level examination that works to map broad emerging themes in the data science education literature to their respective intellectual foundations.
+At the time this analysis was originally developed, there was growing evidence that there were relatively independently developing communities of data science education scholarship emerging. Mike et al [-@mike2023] identified a collection of different themes these communities attended to; and, Rosenberg & Jones [-@rosenberg2024] described how they were drawing from different collections of literature. However, these prior reviews varied dramatically in scope and method, making it difficult to understand the relationship between thematic trends and different foundational literatures. One goal of this ineractive is to offer a living, "meso" level examination that works to map broad emerging themes in the data science education literature to their respective intellectual foundations.
 
 ## 1.2 Document Co-Citation Mapping to Understand Interdisciplinary Fields
 
@@ -92,9 +90,7 @@ Consistent with the bibliometric co-citation methods described in Section 1.2, t
 
 ## 2.1 Identifying "Core" Data Science Education Publications
 
-This review is focused on an intentionally narrow, but relevant and well-specified set of initial works to form the “core” set of papers meant to represent the field: publications that are indexed in either Scopus or Clarivate Analytics Web of Science and that include the specific full phrase “data science education” in the title, abstract, or keywords. As of Dec 9, 2024, this query yielded a total of 287 records after screening to remove duplicates and inappropriate records. Records deemed inappropriate included one correction statement (for which the corrected report remained included), one retraction statement and the corresponding retracted article, four full conference review records, and one full poster session review record. For each of the four excluded conference proceedings records, I confirmed that the more specific corresponding record included in the full review was included instead. For the excluded poster session review record, corresponding poster records were not available. None of the five review records that were removed included cited reference information. [Figure 2](#prisma-fig) features a PRISMA diagram describing the construction of the `coreDSEworks` dataset.
-
-![PRISMA diagram describing construction of the coreDSEworks corpus](static/prisma.png){#prisma-fig}
+This review is focused on an intentionally narrow, but relevant and well-specified set of initial works to form the “core” set of papers meant to represent the field: publications that are indexed in either Scopus or Clarivate Analytics Web of Science and that include the specific full phrase “data science education” in the title, abstract, or keywords. I remove records deemed inappropriate, including correction statements (for which corrected reports remain included), retraction statements and their corresponding retracted articles, full conference review records, and full poster session review records. For excluded full proceedings records, I confirm that any more specific corresponding records are included when available.
 
 ```{r}
 #| label: get-core-works
@@ -104,7 +100,7 @@ source("scripts/read_works.R")
 coreDSEworks <- getCoreDSEWorks()
 ```
 
-While the focus of this paper is not on the core works themselves, it is useful to briefly review some key descriptive characteristics of the `coreDSEworks` collection to determine its validity for this analysis. The histogram featured in Figure 3 reflects the nascent nature of this area of study, with the first publication appearing in 2012 and relatively steady growth since then.
+The histogram featured in Figure 3 reflects the nascent nature of this area of study, with the first publication appearing in 2012 and relatively steady growth since then.
 
 ```{r}
 #| label: show-pub-years
@@ -116,7 +112,7 @@ hist(coreDSEworks$PY, breaks=seq(2011,2025,1), xaxt='n')
 axis(side=1, at=seq(2011.5,2024.5, 1), labels=seq(2012,2025,1))
 ```
 
-A review of the identified documents similarly confirms that this is a reasonable set of publications to begin with. Table 1 below previews five randomly selected records from the `coreDSEworks` dataset. As intended, the set of works appears to be conservatively chosen to include only research that is explicitly focused on “data science education.” In other words, while there may be some expected works missing from the set, the `coreDSEworks` set does reasonably represent a core set of scholarly papers that all center the study and practice of data science education.is.na(myTest)
+To help confirm that this is a reasonable set of publications to begin with, Table 1 below previews records from the `coreDSEworks` dataset. While there may be some expected works missing from the set, the goal is for the `coreDSEworks` set to reasonably represent a core set of scholarly papers that all center the study and practice of data science education.
 
 ```{r}
 #| label: display-core-works
@@ -130,11 +126,11 @@ datatable(coreDSEworks[
 )
 ```
 
-Of the publication records that are included in the `coreDSEworks` dataset, seven do not include information about cited references. Manual inspection reveals that these records are editorials and commentaries. Nevertheless, these works represent substantive contributions to the literature, and provide information about the venues and authors that are actively contributing to the “data science education” discourse. Therefore, they were not excluded from this dataset. However, because they works do not include reference lists, only 280 records directly impact the construction of the reference works dataset and the reference co-citation network that are described in the following sections and that are the focus of this paper.
+Of the publication records that are included in the `coreDSEworks` dataset, there are some that do not include information about cited references. Manual inspection reveals that typically these records are editorials and commentaries. Since these works represent substantive contributions to the literature, and provide information about the venues and authors that are actively contributing to the “data science education” discourse, they are not excluded from this dataset. However, because they works do not include reference lists, such records also do not directly impact the construction of the reference co-citation network that is described in the following sections.
 
 ## 2.2 Extracting and Cleaning DSE Reference Works
 
-Next, we can construct a new dataset called `refWorks` to represent the full set of works cited by the "data science education" papers included `coreDSEworks`. Extracting each cited paper from the full cited references list of each `coreDSEworks` paper yields a total of 8,694 unique records.
+Next, construct a new dataset called `refWorks` to represent the full set of works cited by the "data science education" papers included `coreDSEworks`. This is done by extracting each cited paper from the full cited references list of each `coreDSEworks` paper.
 
 ```{r}
 #| label: extract-reference-works
@@ -144,9 +140,9 @@ refWorks <- as.data.frame(
   citations(coreDSEworks, field = "article", sep = ";")$Cited)
 ```
 
-However, as noted by Mike et al [-@mike2023], processing reference data is not trivial. The cited reference lists included in Scopus and WoS databases are text-only, and the formats that are used across the style guides of various disciplines engaged in data science education (e.g. Association for Computing Machinery, American Psychological Association, Institute of Electrical and Electronics Engineers) are quite different. Even more standardized ways of citing references, such as the Document Object Identifier number (DOI), are not always included in reference lists or available for all relevant publications.
+As noted by Mike et al [-@mike2023], processing reference data is not trivial. The cited reference lists included in Scopus and WoS databases are text-only, and the formats that are used across the style guides of various disciplines engaged in data science education (e.g. Association for Computing Machinery, American Psychological Association, Institute of Electrical and Electronics Engineers) are quite different. Even more standardized ways of citing references, such as the Document Object Identifier number (DOI), are not always included in reference lists or available for all relevant publications.
 
-These difficulties are most likely to arise for higher-profile papers that have been picked up by different scholarly communities, and are therefore cited in multiple formats. Consider, for example, the National Academies' [-@nationalacademiesofsciencesengineeringandmedicine2018] report *Data Science for Undergraduates: Opportunities and Options* report. Table 2 features several records which match the substring “data science for undergraduates.” The majority of matching records were intended to represent that report, but have been extracted and tallied as distinct references. Other records that employ abbreviations (e.g., “data sci und opp opt”) but clearly refer to this report also appear as distinct references. The top row, with 18 citations, appears as the most frequently cited record in the whole coreDSEworks dataset, but this reference is clearly severely undercounted.
+These difficulties are most likely to arise for higher-profile papers that have been picked up by different scholarly communities, and are therefore cited in multiple formats. Consider, for example, the National Academies' [-@nationalacademiesofsciencesengineeringandmedicine2018] report *Data Science for Undergraduates: Opportunities and Options* report. Table 2 features several records which match the substring “data science for undergraduates.” The majority of matching records were intended to represent that report, but have been extracted and tallied as distinct references.
 
 ```{r}
 #| label: demo-duplicates
@@ -156,11 +152,11 @@ showabit <- refWorks %>% filter( CR %like% "DATA SCIENCE FOR UNDERGRADUATES" ) %
 datatable(showabit,
   rownames=FALSE,
   colnames=c('Cited Reference','Freq'),
-  options=list(pageLength=12, class='compact stripe')
+  options=list(pageLength=5, class='compact stripe')
 )
 ```
 
-If records such as the ones above are not consolidated, the well-known *Data Science for Undergraduates* report [-@nationalacademiesofsciencesengineeringandmedicine2018] would be represented in the network as several isolated papers, each with only marginal impact on the field as a whole. To address this problem of duplicate records and ensure that the resulting reference co-citation network is accurate, I turn `refWorks` into a lookup table. Using a combination of methods including removal of special characters, automated text matching, and a manual dictionary of duplicate records screened by author and year, each text reference is mapped to a single parent format.
+If records such as the ones above are not consolidated, the well-known *Data Science for Undergraduates* report [-@nationalacademiesofsciencesengineeringandmedicine2018] would be represented in the network as several isolated papers, each with only marginal impact on the field as a whole. To address this problem of duplicate records and ensure that the resulting reference co-citation network is accurate, turn `refWorks` into a lookup table. Using a combination of methods including removal of special characters, automated text matching, and a manual dictionary of duplicate records screened by author and year, each text reference is mapped to a single parent format.
 
 ```{r}
 #| label: generate-lookup-table
@@ -174,17 +170,21 @@ refWorks$correctedCR <- ""
 refWorks$freqAgg <- refWorks$Freq
  
 refWorks <- cleanSpecialChars(refWorks) 
+# NOTE The Aug 2025 update to refs removed multiple authors from many records. 
+# I use manualdupes.txt to retain original references when they have more info.
 refWorks <- cleanManualDuplicates(refWorks) 
-refWorks <- autoMatch(refWorks,.75)
-```
+# NOTE By removing multiple authors, the Aug 2025 update also made false automatch 
+# more likely. I've increased sensitivity from .75 to .8
+refWorks <- autoMatch(refWorks,.80)
 
-After consolidating duplicate records in this way, the total count of unique reference records falls to 7,484.
+paste0("There are now ",count(refWorks)," records in refWorks.")
+```
 
 The lookup table is then used to replace all duplicate versions of a given reference that appear in the text reference lists within the `coreDSEworks` dataset with the corrected parent reference text. The total citation frequency for each reference is then recalculated by counting the number of `coreDSEworks` that include each corrected parent reference.
 
 ```{r}
 #| label: tally-corrected-refs-in-coreDSEworks
-#| output: false
+#| output: true
 
  # Replace refs lists in the core works datatable with cleaned refs
  coreDSEworks <- rewriteCleanRefs(coreDSEworks,charExcludeList)
@@ -193,7 +193,7 @@ The lookup table is then used to replace all duplicate versions of a given refer
  refWorks <- correctFrequenciesCited(refWorks,coreDSEworks)
 ```
 
-After this round of cleaning, the citation frequency of more popular reference works changes substantially. Table 3 features the top 5 records in the corrected `refWorks` dataset, ordered by frequency of citations. The *Data Science for Undergraduates* reference that was originally listed as the most frequently referenced citation at 18 shows a total of 40 references after consolidation; this reference is superseded by De Veaux et al's [-@deveaux2017] curriculum guidelines as the reference work that is most cited by the focal `coreDSEworks`.
+After this round of cleaning, citation counts for references that appeared multiple times in the list are consolidated.
 
 ```{r}
 #| label: show-corrected-refs
@@ -209,7 +209,7 @@ datatable(refWorks[c(3,5)] %>%
 
 ## 2.3 Indexing Between Core and Reference Works
 
-To facilitate interpretation of the results, I created unique document indices to link reference records across datasets. The indices leverage a naming convention that is also employed by the bibliometrix analysis package when it generates a co-citation network from bibliographic data (see Section 3.2). Each reference document is assigned a name in the format: author last name, author first initial(s), year of publication (for example, conway d 2010). An attribute is also added to each `coreDSEworks` record, which stores the shortnames for all of that record’s cited references.
+To facilitate interpretation of the results, create unique document indices to link reference records across datasets. The indices leverage a naming convention that is also employed by the bibliometrix analysis package when it generates a co-citation network from bibliographic data (see Section 3.2). Each reference document is assigned a name in the format: author last name, author first initial(s), year of publication (for example, conway d 2010). An attribute is also added to each `coreDSEworks` record, which stores the shortnames for all of that record’s cited references.
 
 ```{r}
 #| label: generate-shortnames
@@ -220,27 +220,13 @@ refWorks <- refShortNames(refWorks)
 coreDSEworks <- coreShortNames(coreDSEworks,refWorks)
 ```
 
-In cases where more than one distinct reference record exists with the same identifier, shortnames are each appended with a number, by descending citation frequency of their corresponding record. For example, `biehler r 2018` and `biehler r 2018-2` are generated to refer to Biehler et al [-@biehler2018] and Biehler (2018), respectively, with the former having been cited more times by coreDSEworks than the latter. Since the shortname links records across all three of the coreDSEworks, refWorks, and bibNetwork datasets, they allow insights to be mapped across reference levels (e.g. between citing and cited works) and structural relationships among records (e.g. across clusters, bridges, and other network structures).
+In cases where more than one distinct reference record exists with the same identifier, shortnames are each appended with a number, by descending citation frequency of their corresponding record.
 
-```{r}
-#| label: illustrate-shortnames
-
-biehler <- refWorks %>% filter(shortname %like% "biehler r 2018")
-
-datatable(biehler[c(1,5,8)] %>%
-            filter(freqCit > 0) %>%
-            arrange(desc(freqCit)),
-  colnames=c('Cited Reference','# Citing DSE Works','Shortname'),
-  rownames=FALSE,
-  options=list(pageLength=5, class='compact stripe')
-)
-```
-
-As the differences between information displayed in Table 1 versus Table 2 indicate, records in the coreDSEworks dataset are much more robust, with information parsed into relevant columns (e.g. author, year, source, title, etc.) while refWorks records are simple strings reflecting a variety of ill-defined and at times difficult-to-parse formats. Within refWorks, the most common format for these strings, which are meant to represent a full reference, begins with an author list, followed by title and source information, and ends with the year. To introduce consistency in the presentation of results across datasets given these limitations, all reference tables presented in the results section will follow the same format including the first author, year, and full available reference information in separate columns. Full references of coreDSEworks records will be re-formatted to follow the most common full reference format in refWorks.
+Records in the coreDSEworks dataset are much more robust, with information parsed into relevant columns (e.g. author, year, source, title, etc.) while refWorks records are simple strings reflecting a variety of ill-defined and at times difficult-to-parse formats. Within refWorks, the most common format for these strings, which are meant to represent a full reference, begins with an author list, followed by title and source information, and ends with the year. To introduce consistency in the presentation of results across datasets given these limitations, all reference tables presented in the results section will follow the same format including the first author, year, and full available reference information in separate columns. Full references of coreDSEworks records will be re-formatted to follow the most common full reference format in refWorks.
 
 # 3. Constructing the Reference Co-Citation Network
 
-Finally, a bibliographic co-citation network is constructed using the cleaned and consolidated reference records. I limit the network to include only reference works that were cited at least 3 times—that is, works that appeared in the reference lists of more than 1% of the 287 total coreDSEworks—in order to focus on repeated reference patterns that are suggestive of community practices, rather than spurious relationships that are limited to only one or a few papers. This limit produces a network with 329 records out of 7,485 reference works—in other words, fewer than 5% of reference works are cited by at least 1% of core works, indicating that the field is still drawing from rather broad foundations.
+Finally, a bibliographic co-citation network is constructed using the cleaned and consolidated reference records. I limit the network to include only reference works that were cited at least 3 times in order to focus on repeated reference patterns that are suggestive of community practices, rather than spurious relationships that are limited to only one or a few papers.
 
 ```{r}
 #| label: generate-ref-net
@@ -249,9 +235,9 @@ refMatrix <- biblioNetwork(coreDSEworks, analysis = "co-citation",
                            network = "references", sep = "; ", short=TRUE)
 ```
 
-To identify clusters I use the Leiden community detection algorithm, a form of clustering that seeks to maximize the connectedness of nodes *within* vs *between* clusters, whilst maintaining that each community’s nodes are internally connected [@traag2019]. Leiden determines the number of clusters automatically as it maximizes the modularity score (internal vs cross-cluster connections). In the context of bibliographic analysis, this means the algorithm identifies both the number and composition of scholarly communities as represented by more frequently co-cited works and ensures that each work within a given community is connected to each other community member through an internal path of co-citations.
+Identify clusters using the Leiden community detection algorithm. This is a form of clustering that seeks to maximize the connectedness of nodes *within* vs *between* clusters, whilst maintaining that each community’s nodes are internally connected [@traag2019]. Leiden determines the number of clusters automatically as it maximizes the modularity score (internal vs cross-cluster connections). In the context of bibliographic analysis, this means the algorithm identifies both the number and composition of scholarly communities as represented by more frequently co-cited works and ensures that each work within a given community is connected to each other community member through an internal path of co-citations.
 
-The Leiden community detection algorithm is not deterministic. Each time the code is run, the output is slightly (and sometimes more than slightly) different. My analysis below takes steps to reduce uncertainty by separating boundary works (which are likely change cluster membership across runs) from core cluster nodes, and by focusing on general trends rather than relying on specific papers when making claims about the nature and composition of clusters. Additionally, I tested the findings reported here against multiple runs of the code: (1) with the same network setup conditions; (2) across setup conditions with cutoffs of 3 (329 records), 4 (205 records), and 5 (138 records); and (3) with two alternative community identification algorithms that are available in the bibliometrix package and commonly used in bibliographic analysis [Louvain and Walktrap; @subelj2016].
+The Leiden community detection algorithm is not deterministic. Each time the code is run, the output is different. The analysis below takes steps to reduce uncertainty by separating boundary works (which are likely change cluster membership across runs) from core cluster nodes, and by focusing on general trends rather than relying on specific papers when making claims about the nature and composition of clusters. I also suggest running the analysis multiple times to examine the stability of results, and comparing results to two alternative community identification algorithms that are available in the bibliometrix package and commonly used in bibliographic analysis [Louvain and Walktrap; @subelj2016].
 
 ## 3.1 The Reference Co-Citation Network, Visualized
 
@@ -282,18 +268,16 @@ net2Pajek(refNet,"data/refNet")
 ```
 
 ::: callout-note
-**STOP HERE AND CHECK!** The clustering and layout algorithms used for this analysis have stochastic elements. *Occasionally*, when you run this, things will shake out such that the colors and clusters I reference in the text in a "hard coded" way below are mixed up. This doc is written with the assumption that you got the likely result, where the cluster with the largest nodes is red, and the cluster that is spatially the most uniform is blue. You may want to double check and see if this is your arrangement. If not, congratulations! You have obtained a rare network arrangement. If you'd like, take an extra moment to confirm that even with this less likely result, the general nature and constitution of the clusters are the same (though their outputs may be swapped from what is expected in Sections 4.1, 4.2, and 4.3 below). Then, for readability, re-running the chunk above to obtain the more frequent assignment of clusters and then re-running the dependencies below will fix things so the text matches the output.
+**NOTE!** Both the clustering and layout algorithms used for this analysis have stochastic elements. It's not unlikely that things will shake out differently across runs. Consider the stability of results, and the nature and composition (rather than only assignment/coloring) of clusters as you work to interpret the results.
+
+For an example of deeper interpretation of results from an earlier version of this analysis, please consult the article [Wilkerson, M. H. (2025). Mapping the Conceptual Foundation(s) of "Data Science Education". *Harvard Data Science Review, 7*(3). doi: ](https://hdsr.mitpress.mit.edu/pub/1vd80i9t/release/2)<https://doi.org/10.1162/99608f92.9ac68105>
 :::
-
-It is important to note that the network layout and clustering algorithms used in this work include stochastic elements, and your results may vary when re-running the code or examining the interactive Quarto doc. For example, the position of certain nodes in the network may change, and the centrality measures and cluster memberships of certain works at the boundaries between literatures also change. However, the emergence of these clusters and their thematic foci is highly robust to different configurations and runs of the code. My analysis below takes steps to reduce uncertainty by separating broker works from core cluster membership, and by focusing on general trends rather than relying on specific papers whenever possible when making claims about the nature and constitution of clusters.
-
-The network visualization, as well as computational cluster analysis of the network structure, reveal three distinct and relatively isolated clusters of co-cited literature. As I will describe in more detail in Section 4, these clusters broadly represent to collections of research focused on Undergraduate Data Science programs (red); K-12 Education (blue); and Computing for Non-Majors (green). Consistent with research on bibliometric citation network analysis [e.g., @aria2017; @trujillo2018; @zupic2015], I conceptualize of these three clusters as representing distinct intellectual communities that together form the foundations of the data science education field. Below, I first briefly review shared or “broker” works that span these distinct communities. Then, I examine each distinct community of literature in more detail with a focus on the audiences, conceptual content, pedagogies, and methodologies that are emphasized by each.
 
 ## 3.2 Broker Works: Papers Cited by the Data Science Education Field at Large
 
-A broker describes a node in a network that connects otherwise distinct communities. Brokers are characterized by high betweenness centrality, which measures the degree to which a given node offers the shortest path (or in this case, is most closely connected through chains of co-citation) between other pairs of nodes in the network. In Figure 3, these works can be identified visually as the several red nodes and few blue nodes that are positioned more centrally within the global network. In the context of bibliographic networks, broker nodes reflect scholarly “bridges” that appear in reference lists alongside otherwise distinct collections of work. This suggests these works have higher visibility and serve to establish common ground across communities.
+A broker describes a node in a network that connects otherwise distinct communities. Brokers are characterized by high betweenness centrality, which measures the degree to which a given node offers the shortest path (or in this case, is most closely connected through chains of co-citation) between other pairs of nodes in the network. In the visualization above, these works can be identified visually as the nodes that are positioned more centrally within the global network. In the context of bibliographic networks, broker nodes reflect scholarly “bridges” that appear in reference lists alongside otherwise distinct collections of work. This suggests these works have higher visibility and serve to establish common ground across communities.
 
-The top ten broker works as identified by betweenness centrality are featured in Table 5. This collection includes well-known articles that work to define the nature of data science as a field [@berman2018; @cleveland2001; @donoho2017], and that present frameworks and guidelines to ensure that new data science training programs support the development of key data skills students should learn [@anderson2014; @deveaux2017; @nationalacademiesofsciencesengineeringandmedicine2018], including how they intersect with industry [@demchenko2016] and academia [@irizarry2020].
+The top ten broker works as identified by betweenness centrality are featured in the table below.
 
 ```{r}
 #| label: pull-top-brokers
@@ -328,17 +312,11 @@ datatable(left_join(refBrokers, relevantRefs, by=c("vertex"="shortname") )[c(11,
 )
 ```
 
-There are straightforward reasons that most of these works would appear in a wide variety of papers focused on data science education. They seek to define what constitutes the field, identify the skills needed to successfully participate and contribute, and describe early efforts to establish and share emerging professional programs of study. They also reflect the interdisciplinarity of the field as a whole: This short list describes work that has appeared in venues including national and international reports, major journals in the fields of statistics, major journals and proceedings in computer science, and emerging data-science-specific publications.
+# 4. Characterizing the Foundational Literatures of Data Science Education
 
-As is usually the case in document co-citation, broker works also tend to be the more highly cited works. This makes sense – the more a work is cited, the more visible it is and the more opportunities there are for it to appear alongside new and different references. However, some references stand out for their high betweenness centrality despite relatively modest citation counts. These include papers focused on sociological studies of data science as a field [@boyd2012], and one focused on precollegiate data science education. Dasgupta and Hill [@dasgupta2017] describes the design of a set of new blocks for the Scratch block-based programming language for children. It is also the only paper that appears within the top 20 broker papers to focus squarely on K-12 learners [another, @finzer2013, highlights a corresponding need to prepare K-12 teachers].
+Let's try to describe each of the clusters that were identified through the methods above. Below, for each cluster, only references that fall below the 80^th^ percentile of betweenness centrality are listed. I refer to these as “cluster isolates.” By filtering the dataset in this way, we can focus only on the research papers that are unique to each cluster, that is, they are only cited alongside other reference works that are members of the same cluster. This also lessens the risk of drawing incorrect interpretations of clusters due to the uncertainty built into algorithms that determine and visualize cluster membership of bridging works. The code below sets up to extracts the cluster isolates for each cluster identified in the analysis above.
 
-When looking at an expanded collection of the top 50 broker works, a number of other similarities emerge. A variety of popular books highlighting the ethical challenges of data science [e.g., @benjamin2019; @dignazio2020; @noble2018; @oneil2016], curricular frameworks and reviews of research in related areas [@bargagliotti2020; @hardin2015; @lee2021], and foundational works chronicling the ascendance of computing and big data [@nolan2010; @tukey1992; @wing2006] are included. Together, this all suggests that despite the new and at times nebulous character of data science education, there is some awareness (if not convergence) around approaches to program design, frameworks defining the key skills involved, ethical considerations, and historical foundations.
-
-# 4. Characterizing the Three Foundational Literatures of Data Science Education
-
-While an exploration of broker works suggests there is some shared literature that holds the field of data science education together, even the most popular of these broker works are cited by only 40 or 45 papers out of the 287 within the `coreDSEworks` dataset. This represents about 15% of the full collection of data science education core works. While the works identified above do appear to be commonly cited alongside a wide variety of other papers, this somewhat low level of overlap suggests there is still not much evidence of a common, core literature base among data science education scholarship. Consider that, in contrast, a recent bibliometric review of research on computational thinking [a similarly interdisciplinary and relatively new educational domain; @irawan2024] in mathematics learning found that the top two reference works—Wing [-@wing2006] and Papert [-@papert1980]—were cited by 80% and 63%, respectively, of the full collection of papers analyzed.
-
-Here, I work to better understand the distinctive characteristics of each cluster of literature in terms of its audience, content focus, pedagogical orientations, and methodologies. I focus only on references within each cluster that fall below the 80^th^ percentile of betweenness centrality. I refer to these filtered clusters as “cluster isolates,” to emphasize that members with higher betweenness centrality have been removed. By filtering the dataset in this way, I focus only on the research papers that are unique to each cluster, that is, they are only cited alongside other reference works that are members of the same cluster. This also lessens the risk of drawing incorrect interpretations of clusters due to the uncertainty built into algorithms that determine and visualize cluster membership of bridging works.
+In the original version of this analysis published in July '25, three relatively stable clusters were identified. This may change as more records are added to the document and new citation patterns emerge. Therefore, I've set the document up to describe up to five clusters. Some may be empty if fewer than five clusters were identified.
 
 ```{r}
 #| label: prepare-to-extract-clusters
@@ -397,9 +375,9 @@ getHeavyCitingWorks <- function(coreDSEworks,n,range="[1-3]") {
 }
 ```
 
-## 4.1 Data Science Undergraduate Major Programs
+## Cluster 1
 
-The red nodes visualized in Figure 3 represent the most prominent of the three clusters. This cluster holds the majority of broker works featured in Table 5, and it is the cluster that is most centrally positioned within the global network layout. When examining the isolate of this cluster – that is, the membership of the red cluster that fall below the 80^th^ percentile of betweenness centrality is comprised of work that speaks to curriculum development and strategies to introduce data science to specialists at the postsecondary level. After removing cluster members with high betweenness centrality, the remaining members of this isolate (Table 6) focus squarely on the education of undergraduate data science majors.
+The members of cluster 1 isolate are:
 
 ```{r}
 #| label: see-cluster-hub-1
@@ -411,17 +389,9 @@ datatable(getClusterHub(1)[c(6,7,3,5)],
 )
 ```
 
-### 4.1.1 Key Characteristics of Reference Works
+### Recent Citing Works
 
-While there is no clear publication venue that is dominant within this collection of papers, this cluster suggests there is already quite a bit of interdisciplinary collaboration between the set of disciplines involved in the training of undergraduate data science majors. The cluster features journals and conferences focused on statistics education (the *Journal of Statistics and Data Science Education*, *Teaching Statistics*), computer science and engineering (*Communications of the ACM; Journal of Engineering Education*), information technologies (*Education and Information Technologies, Data Technologies and Applications*), and library science (*Journal of Academic Librarianship, Journal of Education for Library and Information Sciences*).
-
-This cluster isolate of works focuses on data science teaching, curriculum, and assessment at the college level. It includes papers that describe desired skills and competencies (e.g. social responsibility and ethics, data science applications, transparent and reproducible methods, data science in industry), as well as the various roles that different departments might play in the establishment and administration of data science major programs of study. This cluster also includes reference to some of the most prominent tools used in professional and scientific data science practice, including Jupyter notebooks, R packages such as ggplot, and related reproducible programming practices.
-
-Some items in this cluster isolate lend insight into this community’s pedagogical orientations and methodological approaches to data science education. Multiple papers refer to active learning and lab- and practice-based learning experiences for students. Several methodological texts, not related explicitly to data science but apparently informing the empirical research emerging from this community of foundational work, reference qualitative and naturalistic research methods. (This seems especially appropriate at a time when the field is working to understand what the student and instructor experience looks like in this new domain.)
-
-### 4.1.2 Recent Citing Works
-
-Using the shortname identifiers, we can perform a co-citation coupling analysis to identify recent coreDSEworks that heavily cite papers from the Data Science Undergraduate Major cluster. This confirms an active community of researchers that are examining the design and enactment of data science courses and programs for undergraduates. The citing works also include more recent methodological developments for studying these undergraduate data science contexts.
+Using the shortname identifiers, a co-citation coupling analysis can identify recent coreDSEworks that heavily cite papers from this cluster. The DSE works whose citation list features 80% or more refWorks-indexed works from Cluster 1 are:
 
 ```{r}
 #| label: find-citing-core-works-cluster1
@@ -429,55 +399,16 @@ Using the shortname identifiers, we can perform a co-citation coupling analysis 
 
 coreCitingWorks1 <- getHeavyCitingWorks(coreDSEworks,1)
 
-datatable(coreCitingWorks1[c(93,5,94)],
+datatable(coreCitingWorks1[c(85,5,86)],
   rownames=FALSE,
   colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
 
-## 4.2 K-12 Education and the Learning Sciences
+## Cluster 2
 
-A second cluster of foundational literature, represented by blue nodes in Figure 3, is comprised of a collection of work that describes the skills and competencies that younger learners and the public should develop related to data science. This cluster isolate includes studies that focus primarily on pre-college data science learning experiences in formal and informal learning environments as well as in everyday and home life, as well as on methods for developing students’ more general statistical and data literacies.
-
-```{r}
-#| label: see-cluster-hub-3
-
-datatable(getClusterHub(3)[c(6,7,3,5)],
-  rownames=FALSE,
-  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
-  options=list(pageLength=10, class='compact stripe')
-)
-```
-
-### 4.2.1 Key Characteristics
-
-Publications in this cluster isolate appear in journals focused on the cognitive and learning sciences such as the *Journal of the Learning Sciences* and *Cognition and Instruction*, as well as in statistics and mathematics education journals such as the *Journal for Statistics and Data Science Education*, *Statistics Education Research Journal*, and associated conferences. Several K-12 standards documents such as the Common Core State Standards in Mathematics [@nationalgovernorsassociationcenterforbestpracticescouncilofchiefstateschoolofficers2010], GAISE II [@bargagliotti2020], the International Data Science in Schools framework [@idsspcurriculumteam2019], and the Next Generation Science Standards [@ngss2010] are also featured in this cluster isolate.
-
-While not all the works featured in this isolate focus specifically on K-12 education, the emphasis is on young learners and non-specialists and focuses on these learners’ interactions with data within various school subjects and everyday life (e.g. media literacy and personal data management). This cluster isolate also includes descriptions and reviews of popular software packages used in K-12, and what might be considered foundational (pre-“data science”) research on student thinking and learning about data, representations and visualizations of data, inference, and data/statistical literacy.
-
-Consistent with the focus on K-12 education, this cluster often emphasizes the learning of data science or related skills as a component of other disciplines (e.g. science, mathematics, computing), or as part of what it means informed navigation of the modern workplace and world. In terms of pedagogy, there is an emphasis on interdisciplinary integration (including with the arts and social sciences) and storytelling-based approaches to data. Consistent with a grounding in the learning sciences, the cluster isolate includes references to design-based research, a methodology in which learning theory is operationalized within new educational designs with the goal of “…bringing about new forms of learning in order to study them” [@cobb2003, p.10].
-
-### 4.2.2 Recent Citing Works
-
-Recent coreDSEworks that heavily cite papers from the K-12 Education and Learning Sciences cluster similarly include empirical studies of K-12 data science education tools and activities, and reviews that serve to examine how data science might be situated within the K-12 curricular landscape. It is worth noting that while these works indicated the phrase “data science education” in the keywords or abstract, the titles suggest less emphasis on technical or computational learning goals and more emphasis on students’ general comfort and facility with data via “data storytelling,” “data literacy,” and “data inquiry/exploration.”
-
-```{r}
-#| label: find-citing-core-works-cluster3
-#| warning: false
-
-coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
-
-datatable(coreCitingWorks3[c(93,5,94)],
-  rownames=FALSE,
-  colnames=c('First Author','Year','Citing Paper'),
-  options=list(pageLength=5, class='compact stripe')
-)
-```
-
-## 4.3 Computational Approaches to Data for Non-Majors
-
-A third cluster consists of work, represented by green nodes in Figure 3, that describes bringing the computational tools and methods of data science to students who are non-specialists. Structurally, this cluster features fewer nodes with high betweenness measures or high citation counts as compared to the other two clusters. Members of the Computational Approaches for Data for Non-Majors cluster isolate (Table 10) emphasize computational methods including data mining, simulation, and computing enacted in science contexts.
+The members of cluster 2 isolate are:
 
 ```{r}
 #| label: see-cluster-hub-2
@@ -489,19 +420,9 @@ datatable(getClusterHub(2)[c(6,7,3,5)],
 )
 ```
 
-### 4.3.1 Key Characteristics
+### Recent Citing Works
 
-Unlike the more multidisciplinary foundations of the other clusters, the third cluster is founded more squarely within the computational sciences. Publications in this cluster isolate primarily appear in Computer Science (the *ACM’s Special Interest Group in Human-Computer Interaction*; ) and Computing Education (the *ACM’s Special Interest Group in Computer Science Education “SIG-CSE”*; *Koli Calling*; the *ACM’s International Conference on Computing “ICER”*) conferences and associated publications.
-
-The papers in this cluster isolate address multiple student audiences, including undergraduate and pre-collegiate (including both middle and high school) populations. However, it is distinguished conceptually from both of the other clusters in different ways. Whereas the first cluster includes work that is squarely focused on undergraduate major programs, this cluster emphasizes the role of data for undergraduate non-major programs of study at institutions of higher learning, including minor and certificate programs and other STEM majors. This may reflect a community that investigates data science education within specific application domains; for example, data science experiences and frameworks in the context of biology, health, and industry are represented here. The papers in this cluster isolate that focus on K-12 emphasize curricular development of new, computationally-rich experiences for youth, rather than curricula that integrate data into existing subject matter or studies that theorize or empirically study student reasoning with data.
-
-Like the other clusters, this cluster isolate includes some historical (pre-“data science”) references that shed light on pedagogy and methodology. There is a reference to project-based learning, and to references to self-determination theory and expectancy-value theory which posit the personal, social, and external factors that motivate students to learn. These theoretical foundations in individual motivation depart slightly from the other two clusters’ orientations toward team-based and active learning methods, which are founded in socioconstructivist theories to learning.
-
-One historical reference worth explaining for readers who are less familiar with computing-forward is a reference to the “Iris dataset,” which was first published in the *Annals of Eugenics*. The dataset is included by default in both R and Python scikit-learn, and is used to teach machine learning—affirming this cluster’s emphasis on computational techniques. However the venue, if nothing else, invites reflection on when and how to introduce students to the “difficult past of statistics” [@kennedy-shaffer2024] and ongoing ethical dimensions of data science.
-
-### 4.3.2 Citing Works
-
-Recent citing works of cluster 3, like the reference cluster isolate itself, appear primarily in computer science venues though a recent publication in *Statistics Education Research Journal* suggests this community is making inroads to other disciplinary communities. Of note, one of the citing works is a guidebook with a very high number of references, and that synthesizes activities and approaches described in other related publications. This may explain the relative “flatness” of this cluster as one that is connected by fewer, but more broadly sourced citing works with a large proportion of common references, versus other clusters which share fewer references but are “chained” together by overlapping co-citation relations.
+The DSE works whose citation list features 80% or more refWorks-indexed works from Cluster 2 are:
 
 ```{r}
 #| label: find-citing-core-works-cluster2
@@ -509,110 +430,106 @@ Recent citing works of cluster 3, like the reference cluster isolate itself, app
 
 coreCitingWorks2 <- getHeavyCitingWorks(coreDSEworks,2)
 
-datatable(coreCitingWorks2[c(93,5,94)],
+datatable(coreCitingWorks2[c(85,5,86)],
   rownames=FALSE,
   colnames=c('First Author','Year','Citing Paper'),
   options=list(pageLength=5, class='compact stripe')
 )
 ```
 
-## 4.4 Works that Cite Across Communities
+## Cluster 3
 
-Finally, I searched the coreDSEworks dataset for examples of records whose reference lists feature a balance of references across all three of the clusters identified above (including broker works). However, this proved difficult for multiple reasons. Only approximately 15 of the 288 coreDSEworks included *any* references from each of the three clusters identified in this analysis.
+The members of cluster 3 isolate are:
 
 ```{r}
-#| label: find-works-that-cite-all-three
-#| warning: false
+#| label: see-cluster-hub-3
 
-bridges <- coreDSEworks %>% 
-  filter( str_count(coreDSEworks$refInfo,"[1-3]") > 3 )
-  
-bridges <- bridges %>% 
-  filter( str_count(bridges$refInfo,as.character("1")) > 0 )
-
-bridges <- bridges %>% 
-  filter( str_count(bridges$refInfo,as.character("2")) > 0 )
-
-bridges <- bridges %>% 
-  filter( str_count(bridges$refInfo,as.character("3")) > 0 )
-
-bridges <- bridges %>% filter(PY > 2019)
-
-datatable(bridges[c(93,5,94)],
+datatable(getClusterHub(3)[c(6,7,3,5)],
   rownames=FALSE,
-  colnames=c('First Author','Year','Citing Paper'),
-  options=list(class='compact stripe')
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
+  options=list(pageLength=10, class='compact stripe')
 )
 ```
 
-Of these, approximately 5 papers feature reference lists where over 10% of the references originated from each cluster. What is more, the papers that were included in these more diverse reference lists were already (by definition) more likely to be on the boundaries of different clusters, and thus more sensitive to stochasticity when assigned to clusters. This means the list of papers that cite references across clusters changed from run to run, as various broker works switch clusters by run (leading to my use of the term “approximately” above).
+### Citing Works
+
+The DSE works whose citation list features 80% or more refWorks-indexed works from Cluster 3 are:
 
 ```{r}
-#| label: find-bridging-works
+#| label: find-citing-core-works-cluster3
 #| warning: false
 
-bridges <- coreDSEworks %>% 
-  filter( str_count(coreDSEworks$refInfo,"[1-3]") > 5 )
-  
-bridges <- bridges %>% 
-  filter( str_count(bridges$refInfo,as.character("1"))
-          /str_count(bridges$refInfo,"[1-3]") > .1 )
+coreCitingWorks3 <- getHeavyCitingWorks(coreDSEworks,3)
 
-bridges <- bridges %>% 
-  filter( str_count(bridges$refInfo,as.character("2"))
-          /str_count(bridges$refInfo,"[1-3]") > .1 )
-
-bridges <- bridges %>% 
-  filter( str_count(bridges$refInfo,as.character("3"))
-          /str_count(bridges$refInfo,"[1-3]") > .1 )
-
-bridges <- bridges %>% filter(PY > 2019)
-
-datatable(bridges[c(93,5,94)],
+datatable(coreCitingWorks3[c(85,5,86)],
   rownames=FALSE,
   colnames=c('First Author','Year','Citing Paper'),
-  options=list(class='compact stripe')
+  options=list(pageLength=5, class='compact stripe')
 )
 ```
 
-As might be expected, the works that do appear as citing across clusters tend to be review papers surveying the field. However, even these review papers tend to emphasize work from only one cluster, with passing references to others. Given the sensitivity of this set of findings to small perturbations, I advise caution in drawing strong inferences from this list.
+## Cluster 4
 
-# 5. Toward a More Coherent Data Science Education
+The members of cluster 4 isolate are:
 
-This analysis started with an intentionally narrow set of core works—papers that explicitly identify “data science education” in their titles, keywords, or abstracts. While these works certainly do not represent all the literature that one might associate with the study of data science education as it has developed over the past decade, it undoubtedly serves as a window into what the field is and where it might be going.
+```{r}
+#| label: see-cluster-hub-4
 
-Consistent with the ambitious and interdisciplinary nature of data science itself, this core collection of “data science education” works are constructed atop a sprawling landscape of other disciplines and communities. By mapping this landscape, this paper sought to identify the “intellectual structure” of the field—the shared understandings, key resources, and lines of specialization through which it is characterized. An analysis of the co-citation patterns of reference works suggested that while there are some commonly co-cited papers that indicate general agreement about the nature, purpose, and importance of data science education, this field does not yet have a shared core literature. Instead, there seem to be three distinct and active research communities that draw on substantially different foundational literatures focused on Data Science as an Undergraduate Major, K-12 Education and the Learning Sciences, and Computational Approaches to Data for Non-Majors, respectively.
+datatable(getClusterHub(4)[c(6,7,3,5)],
+  rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
+  options=list(pageLength=10, class='compact stripe')
+)
+```
 
-## 5.1 Evidence of Fragmentation
+### Citing Works
 
-These findings confirm what many in our community already suspect: the emerging field of data science education *is* relatively fragmented, and we are all still working to find one another. However, when looking broadly at co-citation patterns of the data science education literature, some of the specific divisions that have been identified across *subcommunities*—for example, between how statistics and computing approach data science [@carmichael2018; @cetinkaya-rundel2019; @cetinkaya-rundel_building_2019; @msweli2023], or between different approaches to K-12 data science education [@rosenberg2024]—do not (yet) reflect deep or persistent fractures in the intellectual foundations of the communities. This is encouraging. While there are certainly distinctions between approaches to data science pedagogy, communities with similar audiences and goals appear to be in conversation, drawing from shared bodies of work even if they are not necessarily at a point of building consensus.
+The DSE works whose citation list features 80% or more refWorks-indexed works from Cluster 4 are:
 
-Instead, there are starker divisions between larger communities that appear to be organized around a complex combination of audience (e.g. specialists vs non-specialists) and content emphasis (e.g. statistics, data literacy, and machine learning methods). In some ways, these divisions are sensible in that they reflect differences in student audiences, disciplinary orientations, and intended outcomes. Publication venue also seems to play an important role, both in terms of scholarly field, and format. However, these distinctions between audience and content emphasis do not entirely explain the intellectual structure that is emerging. For example, both the K-12 Education and the Computing Approaches to Data for Non-Majors clusters feature several works that describe curriculum or programs for K-12 students, but these papers are rarely co-cited with similar works from the other cluster. Similarly, there are overlaps in different clusters’ disciplinary orientations and emphases. Works exploring computer science specific approaches or topics within data science education appear in both the Data Science Undergraduate Major Programs and Computational Approaches to Data for Non-Majors clusters, and common pedagogies (project- based, student-centered, and domain integrative approaches) are emphasized in all three clusters though with different core references.
+```{r}
+#| label: find-citing-core-works-cluster4
+#| warning: false
 
-This fragmentation across student audience and educational level, with at times overlapping but isolated efforts within different clusters, raises concerns about the field’s attention to building a coherent research basis. For example, the Introduction to Data Science/Mobilize project appears in both the K-12 Education/Learning Sciences and Computational Approaches to Data for Non-Majors clusters isolates, via different references [@gould2016 and @gould2018; respectively]. This suggests there are citational ruptures across clusters regarding otherwise very conceptually coherent research topics. Fragmentation of literature across student audiences also raises concerns about our ability to work together to build conceptually coherent data science learning trajectories, as also noted by Rosenberg and Jones (2024). Closer collaboration (or at least, leveraging a common literature base) between communities is likely needed to ensure K-12 students are adequately prepared for future learning. The field would benefit from clearer communication about what general data science competencies as might be needed for particular domain applications reflected in the Computational Approaches to Data, and what is the more specific preparation that is required for Data Science Undergraduate Major programs. And educational efforts across all communities would benefit from deeper understanding of what are main topic areas, audiences, methods, assessments, and learning theories leveraged within the literature as a whole.
+coreCitingWorks4 <- getHeavyCitingWorks(coreDSEworks,4)
 
-## 5.2 Identifying Common Themes
+datatable(coreCitingWorks4[c(85,5,86)],
+  rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
+  options=list(pageLength=5, class='compact stripe')
+)
+```
 
-Although these different (though somewhat interdisciplinary) communities focusing on different combinations of student populations, content learning goals, and pedagogical and methodological orientations, there are a number of resonances to highlight. Across all three clusters, although the references are to different papers, there is a shared thematic focus on active, project-based, and interdisciplinary pedagogies that teach data science in meaningful contexts. There are also clear references to integrating ethics into data science education, and issues of power, ethics, and data for social good were additionally reflected in the broker works that were often co-cited with members of multiple clusters. Though the clusters each focused on starkly different tools, they all explicitly included multiple tools as a core foundation. To relate these commonalities to the themes identified in Mike et al’s [-@mike2023] thematic cluster analysis, all three literature clusters demonstrate general convergence around Mike’s thematic clusters 2 - Pedagogy and 5 - Social aspects.
+## Cluster 5
 
-We can also understand some of the key distinctions between the clusters in terms of the themes outlined in Mike et al (2023). The most obvious of these is around the 1 - Curriculum. The Data Science for Undergraduate Majors cluster is primarily concerned with 1.1- Principles of data science curriculum design, and 1.5- Curriculum design for data science majors. The K-12 Education/Learning Sciences cluster is concerned with 1.4- Curriculum design for K-12 pupils, as is the Computational Approaches to Data for Non-Majors. All of the clusters, to some extent, include references that speak to 1.2- Approaches to data science education and 1.3- Introduction to data science. The Computational Approaches to Data for Non-Majors cluster included more specific references to various types of 4- Domain adaptation.
+The members of cluster 5 isolate are:
 
-All three clusters demonstrate different distributions of the themes in 3-STEM Skills with the Data Science. As anticipated, the Data Science for Undergraduate Majors cluster emphasizes more statistically-oriented stills, while the Data Science for Computational Approaches to Data for Non-Majors focuses on computational skills. The deeper look at specific titles afforded by the analysis here suggests that this might be understood as a distinction around “who or what” is expected to do the work of organizing and making sense of data – humans (via data reasoning) or computers (via classification/machine learning).
+```{r}
+#| label: see-cluster-hub-5
 
-## 5.3 Limitations
+datatable(getClusterHub(5)[c(6,7,3,5)],
+  rownames=FALSE,
+  colnames=c('First Author','Year','Cited Reference', '# Citing DSE Works'),
+  options=list(pageLength=10, class='compact stripe')
+)
+```
 
-Any review of literature involves tradeoffs to maintain interpretable results and a manageable scope. A few important things to remember about this current analysis is that because the field is still new and relatively small, the patterns identified here are particularly sensitive to perturbations. Given that most researchers publish repeatedly, and each of these works impact the construction of the co-citation network at the center of this analysis, some of the patterns are likely driven by only one or a few researchers or research groups. For example, the constitution of cluster 3 is likely disproportionately driven by the large co-citation list included in the book *Guide to Teaching Data Science: An Interdisciplinary Approach* [@hazzan2023]. However, these clusters also bear face validity in that they represent what newcomers to the field are likely to find upon an initial literature search, and what they are likely to understand as relevant literature as they consult reference lists themselves.
+### Citing Works
 
-The small size and interdisciplinarity of publications also make this analysis more sensitive than typical to errors and inconsistencies in reference format, and other “data wrangling” challenges. It is for this reason that I included more detail about data cleaning methods, which included extensively tested combinations of manual and automated reference record matching, than I typically would. Finally, as described some above, the tools used to conduct this analysis include stochastic elements that introduce some elements of uncertainty to the output. To protect against drawing inappropriate conclusions, I focused only on “cluster isolates” when examining the constituencies of each cluster, reducing the likelihood that papers that are susceptible to “boundary errors” (e.g. uncertain cluster membership assignments) were used to define distinctions between clusters.
+The DSE works whose citation list features 80% or more refWorks-indexed works from Cluster 5 are:
 
-Hausten and Larivier [-@haustein2015] highlight the dangers of an over-reliance on bibliometric methods to describe disciplines or scholarly impact. This is particularly true when looking at literature across communities that have very different publication practices. Throughout this paper, I sought to emphasize the structure of the emerging data science education literature: how it reveals distinct communities, how it is distributed across different publication fora, and how it attends to different student audiences, content emphases, and thematic foci. While at times I identify specific papers to exemplify the characteristics of these structural features, the purpose of this paper is not to analyze or assess the impact of any specific authors, institutions, research agendas, or journals on the field.
+```{r}
+#| label: find-citing-core-works-cluster5
+#| warning: false
 
-## 5.4 Opening a Conversation
+coreCitingWorks5 <- getHeavyCitingWorks(coreDSEworks,5)
 
-It was exciting and humbling to engage in this analysis and to learn more about the exciting Data Science Education work going on. It is my hope that this analysis serves as not only an exploratory map, but also as a navigational one that can help researchers interested in data science education to more intentionally reach across fields and consult broader literatures. In addition to the interactivity/searchability I have embedded into this article, I plan to maintain the dse-citan code in hopes that it can facilitate better searching and interfacing across clusters as the field continues to grow. I invite colleagues to join me (or bug me, as the need may arise).
+datatable(coreCitingWorks5[c(85,5,86)],
+  rownames=FALSE,
+  colnames=c('First Author','Year','Citing Paper'),
+  options=list(pageLength=5, class='compact stripe')
+)
+```
 
-The structural divisions identified in this bibliometric analysis reflect current calls in the data science education literature to better articulate the connections and distinctions between K-12 educational efforts, the preparation needed for students to appropriately use data and computing in their domain of emphasis, and the preparation needed for students to specialize in data science study [e.g.; @nationalacademiesofsciencesengineeringandmedicine2018;\@nationalacademiesofsciencesengineeringandmedicine2023]. It is my hope that this mapping project can provide concrete tools to begin building these connections and distinctions. For example, as someone who has advocated for more humanistically-oriented approaches to integrating data into the K-12 curriculum [@lee2021], I was disappointed not to have previously found some very interesting related work at the undergraduate level [@anderson2019; @shah2021] that were surfaced by the analysis. As educational systems begin to consider K-16+ pathways for data science and data literacy, awareness of these intellectual communities, and the disciplinary perspectives and publication venues they reflect, might help to address long-standing cross-curricular challenges at the K-12/college transition [@kirst2017], as well as current tensions regarding data science education policy and practice [@boaler2024].
-
-If we do not work across divides, we risk missed opportunities for collaboration or, worse, we risk building incoherent or inequitable data science trajectories for youth. As it stands the clusters of research focused on K-12 education boast very different emphases, and are designed to serve different populations of students. Such differences in potential experiences should at least be understood and clearly communicated to students, educators, and policymakers. Similarly, at the intersection of K-12 to undergraduate study, we need to better understand what kind of preparation is needed for future majors, non-majors who may nevertheless employ data-intensive methods in their work, and for all students. Navigating the “wild west” of new, interdisciplinary research can be difficult, but as educators we owe it to students to work together to build strong, coherent, and data-rich experiences across the academic lifespan.
+## 
 
 # 6. References
