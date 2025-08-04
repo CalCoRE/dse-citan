@@ -153,7 +153,15 @@ correctFrequenciesCited <- function(refworks,coreDSEworks) {
   
   # for each reference with a correction
   for( correctCR in refWorks$correctedCR ) {
-
+    
+    # The last records update removed several of the most informative
+    # citation formats. This restores them from earlier records so it's
+    # easier to compare across updates (and because they have more info)
+    if(count(refWorks[refWorks$CR==correctCR,])==0) {
+      correctEntry <- data.frame(CR = correctCR, Freq = 0, correctedCR = correctCR, freqAgg = 0, freqCit = 0)
+      refWorks <- rbind(refWorks, correctEntry)
+    }
+    
     refWorks[refWorks$CR==correctCR,]$freqCit <- 
       sum(str_detect(coreDSEworks$CR, correctCR), na.rm=TRUE)
   }
