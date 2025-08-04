@@ -17,7 +17,7 @@ mapCleanRefs <- function(refWorks) {
   # very large author lists, because these lists are treated differently by 
   # different communities. you can print out the likely matchGroup during
   # the shortnaming process in dse_citan.R
-  refWorks <- cleanManualDuplicates(refWorks,"./data/manualdupes.txt")
+  refWorks <- cleanManualDuplicates(refWorks)
   
   # PART 3
   refWorks <- autoMatch(refWorks,.80)
@@ -49,7 +49,7 @@ cleanSpecialChars <- function(refWorks,charExcludeList='[\\:\\(\\)+\\?\\|\\"\\â€
 }
 
 cleanManualDuplicates <- function(refWorks,file="./data/manualdupes.txt") {
-  manual <- read.csv("./data/manualdupes.txt", sep=",")
+  manual <- read.csv(file, sep=",")
   
   # for each item in refWorks
   for( refCR in refWorks$CR ) {
