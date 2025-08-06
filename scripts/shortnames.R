@@ -1,4 +1,4 @@
-refShortNames <- function(refWorks,n=1) {
+refShortNames <- function(refWorks,n=3) {
   # let's approximate the shortnames of the references so we can map
   # them to the network analyses below. Note there will
   # be duplicate shortnames for some records, but we're only interested in the
@@ -38,8 +38,8 @@ refShortNames <- function(refWorks,n=1) {
     if( count( records ) > n ) {
       # Uncomment the line below to print shortnames that need appending.
       # This can be useful for identifying duplicate records.
-      # print(paste("Multiple records for shortname ",
-      #            parentRefShortnames$shortname[i]))
+       print(paste("Multiple records for shortname ",
+                  parentRefShortnames$shortname[i]))
       
       indices <- refWorks %>% 
         filter(shortname == parentRefShortnames$shortname[i]) %>%
